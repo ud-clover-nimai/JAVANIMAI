@@ -18,6 +18,7 @@ import com.nimai.splan.model.NimaiAdvisory;
 import com.nimai.splan.payload.GenericResponse;
 import com.nimai.splan.payload.NimaiAdvisoryBean;
 import com.nimai.splan.service.NimaiAdvisoryService;
+import com.nimai.splan.utility.ErrorDescription;
 
 
 
@@ -48,6 +49,26 @@ public class AdvisoryController {
 				return new ResponseEntity<Object>(response, HttpStatus.OK);
 			}
     }
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping(value = "/getAdvisoryListByCountry", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getAdvisoryByCountryName(@RequestBody NimaiAdvisory nimaiAdvisory) {
+		GenericResponse response = new GenericResponse<>();
+		try {
+			String country_name=nimaiAdvisory.getCountry_name();
+			List<NimaiAdvisory> outdata1 =  (List<NimaiAdvisory>) advisoryService.viewAdvisoryByCountry(country_name);
+			response.setData(outdata1);
+			response.setStatus("Success");
+			return new ResponseEntity<Object>(response, HttpStatus.OK);
+			
+		}
+		catch(Exception e) {
+			response.setStatus("Failure");
+			response.setErrCode("EXE000");
+			response.setErrMessage(ErrorDescription.getDescription("EXE000"));
+			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 	
 }
