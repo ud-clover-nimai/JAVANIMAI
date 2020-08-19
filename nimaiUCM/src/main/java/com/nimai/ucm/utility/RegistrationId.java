@@ -1,0 +1,48 @@
+package com.nimai.ucm.utility;
+
+import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import com.nimai.ucm.service.RegisterServiceImpl;
+
+@Component
+public class RegistrationId {
+
+	@Autowired
+	RegisterServiceImpl registerService;
+
+	public String username(String subscribeType, String bankType) {
+
+		Random randomNumber = new Random(System.currentTimeMillis());
+		int number = randomNumber.nextInt(900) + 1000;
+		String snumber = String.valueOf(number);
+		String userID = "";
+		String initials = null;
+
+			if ((subscribeType.equalsIgnoreCase("CUSTOMER")) || (subscribeType.equalsIgnoreCase("BANK"))
+				|| (subscribeType.equalsIgnoreCase("REFERRER"))) {
+			if (bankType.equalsIgnoreCase("CUSTOMER") && (subscribeType.equalsIgnoreCase("BANK")))
+				initials = "BC";
+			else
+				initials = subscribeType.substring(0, 2);
+			userID = initials.toUpperCase().concat(snumber);
+			return userID;
+		}
+		return userID;
+	}
+
+	public String number() {
+		Random randomNUmber = new Random(System.currentTimeMillis());
+		StringBuilder stringNUmber = new StringBuilder();
+
+		int numbers = 9;
+		for (int i = 0; i < numbers; i++) {
+			int digit = randomNUmber.nextInt(9);
+			stringNUmber.append(digit);
+		}
+		String randomNUmbers = stringNUmber.toString();
+		return randomNUmbers;
+	}
+
+}

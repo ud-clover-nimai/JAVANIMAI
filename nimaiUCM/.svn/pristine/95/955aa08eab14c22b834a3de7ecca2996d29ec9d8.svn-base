@@ -1,0 +1,36 @@
+package com.nimai.ucm.utility;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class ErrorDescription {
+
+	private static Map<String, String> codeToDescriptionMap = new HashMap<String, String>();
+
+	static {
+		codeToDescriptionMap.put("NIM000", "SUCCESS");
+		codeToDescriptionMap.put("NIM001", "FAILURE");
+		
+		codeToDescriptionMap.put("EXE000", "Exception Occurred : ");
+				
+		// For Personal Details and Business Details  Sign Up Process 
+		codeToDescriptionMap.put("ASA001", "Personal Details saved Successfully");
+		codeToDescriptionMap.put("ASA002", "Business Details saved Successfully");
+		codeToDescriptionMap.put("ASA003","Email already exists");
+		codeToDescriptionMap.put("ASA004","Email does not exists.");
+		codeToDescriptionMap.put("ASA005","Business details are not allowed for the referrer.");
+		
+	}
+	
+	public static String getDescription(String code) 
+	{
+		String description = codeToDescriptionMap.get(code);
+		if (description == null) 
+		{
+			description = "Invalid Error Code!";
+		}
+		return description;
+	}
+
+}
+

@@ -1,0 +1,169 @@
+package com.nimai.ucm.service;
+
+import java.util.Calendar;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.nimai.ucm.bean.BusinessDetailsBean;
+import com.nimai.ucm.bean.PersonalDetailsBean;
+import com.nimai.ucm.bean.UserCountryGoodBean;
+import com.nimai.ucm.entity.NimaiClient;
+import com.nimai.ucm.entity.NimaiFCountrygood;
+import com.nimai.ucm.entity.NimaiMLogin;
+import com.nimai.ucm.repository.ForeignCountryGoodRepository;
+import com.nimai.ucm.repository.LoginRepository;
+import com.nimai.ucm.repository.UserDetailRepository;
+import com.nimai.ucm.utility.PasswordGenerator;
+import com.nimai.ucm.utility.RegistrationId;
+
+@Service
+public class RegisterServiceImpl implements RegisterUserService {
+
+	@Autowired
+	RegistrationId userid;
+
+	@Autowired
+	UserDetailRepository detailRepository;
+
+	@Autowired
+	LoginRepository loginRepository;
+
+	@Autowired
+	PasswordGenerator password;
+
+	@Autowired
+	ForeignCountryGoodRepository countryGoodsRepo;
+
+	@Override
+	public PersonalDetailsBean saveRegisterDetails(PersonalDetailsBean personDetailsBean) {
+		NimaiClient clientEntity = new NimaiClient();
+		RegistrationId id = new RegistrationId();
+
+		String subscriberType = personDetailsBean.getSubscriberType();
+		String bankType = personDetailsBean.getBankType();
+		if(bankType == null)
+			{
+				bankType="NA";
+			}
+		clientEntity.setUserid(userid.username(subscriberType,bankType));
+		clientEntity.setSubscriberType(personDetailsBean.getSubscriberType().toUpperCase());
+		clientEntity.setSubscriptionId(id.number());
+		clientEntity.setFirstName(personDetailsBean.getFirstName());
+		clientEntity.setLastName(personDetailsBean.getLastName());
+		clientEntity.setMobileNumber(personDetailsBean.getMobileNum());
+		clientEntity.setEmailAddress(personDetailsBean.getEmailAddress());
+		clientEntity.setCountryName(personDetailsBean.getCountryName());
+		clientEntity.setLandline(personDetailsBean.getLandLinenumber());
+		clientEntity.setDesignation(personDetailsBean.getDesignation());
+		clientEntity.setBusinessType(personDetailsBean.getBusinessType());
+		clientEntity.setCompanyName(personDetailsBean.getCompanyName());
+		clientEntity.setInsertedDate(Calendar.getInstance().getTime());
+		clientEntity.setModifiedDate(Calendar.getInstance().getTime());
+
+		NimaiClient customerRegister = detailRepository.save(clientEntity);
+
+		if (customerRegister != null) {
+			NimaiMLogin loginEntity = new NimaiMLogin();
+			loginEntity.setUserid(customerRegister);
+			loginEntity.setPassword(password.getInitialPassword(8));
+			loginEntity.setIsActPassed("INACTIVE");
+			loginEntity.setInsertedDate(Calendar.getInstance().getTime());
+			loginEntity.setModifiedDate(Calendar.getInstance().getTime());
+			loginEntity.setUserType(personDetailsBean.getSubscriberType());
+			loginEntity.setStatus("INACTIVE");
+			loginEntity.setLastActivityTime(Calendar.getInstance().getTime());
+			loginRepository.save(loginEntity);
+		}
+
+		return personDetailsBean;
+
+	}
+
+	@Override
+	public boolean updatePersonDetailBean(String userId, BusinessDetailsBean businessDetailsBean) {
+
+		NimaiClient user = detailRepository.getOne(businessDetailsBean.getUserId());
+
+		if (user != null) {
+			user.setBankNbfcName(businessDetailsBean.getBankName());
+			user.setAddress3(businessDetailsBean.getAddress3());
+			user.setAddress1(businessDetailsBean.getAddress1());
+			user.setAddress2(businessDetailsBean.getAddress2());
+			user.setBranchName(businessDetailsBean.getBranchName());
+			user.setCity(businessDetailsBean.getCity());
+			user.setMinValueofLc(businessDetailsBean.getMinLCValue());
+			user.setOwnerName(businessDetailsBean.getOwnerName());
+			user.setProvincename(businessDetailsBean.getProvinceName());
+			user.setPincode(businessDetailsBean.getPincode());
+			user.setRegistrationType(businessDetailsBean.getRegistrationType());
+			user.setSwiftCode(businessDetailsBean.getSwiftCode());
+			user.setRegistredOffice(businessDetailsBean.getRegisteredCountry());
+
+			NimaiClient client = detailRepository.save(user);
+			NimaiFCountrygood countryGood = new NimaiFCountrygood();
+			
+			UserCountryGoodBean[] response = businessDetailsBean.getCountrygoodsBean();
+			for (UserCountryGoodBean bean : response) {
+				countryGood.setBlackListGoods(bean.getBlackListGoods());
+				countryGood.setCountriesIntrested(bean.getCountriesIntrested());
+			}
+			countryGood.setUserid(client);
+			countryGoodsRepo.save(countryGood);
+			return true;
+		}
+		return false;
+
+	}
+
+	@Override
+	public BusinessDetailsBean findUserById(String userId) {
+
+		NimaiClient clientEntity = detailRepository.getOne(userId);
+		BusinessDetailsBean detailsBean = new BusinessDetailsBean();
+		detailsBean.setAddress1(clientEntity.getAddress1());
+		detailsBean.setAddress2(clientEntity.getAddress2());
+		detailsBean.setAddress3(clientEntity.getAddress3());
+		detailsBean.setBankName(clientEntity.getBankNbfcName());
+		detailsBean.setBranchName(clientEntity.getBranchName());
+		detailsBean.setPincode(clientEntity.getPincode());
+		detailsBean.setCity(clientEntity.getCity());
+		detailsBean.setComapanyName(clientEntity.getCompanyName());
+		detailsBean.setMinLCValue(clientEntity.getMinValueofLc());
+		detailsBean.setSwiftCode(clientEntity.getSwiftCode());
+		detailsBean.setDesignation(clientEntity.getDesignation());
+		return detailsBean;
+	}
+
+	@Override
+	public BusinessDetailsBean getBusinessDetails(String userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean checkEmailId(String emailId) {
+		return detailRepository.existsByEmailAddress(emailId);
+	}
+
+	@Override
+	public boolean checkUserId(String userId) {
+		return detailRepository.existsById(userId);
+	}
+
+	@Override
+	public NimaiMLogin saveUserCredentials(NimaiMLogin loginEntity) {
+
+		System.out.println(loginEntity);
+		System.out.println("Inside the registration service");
+
+		return loginRepository.save(loginEntity);
+	}
+
+	@Override
+	public NimaiMLogin saveUserCredentials() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

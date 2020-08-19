@@ -1,0 +1,24 @@
+package com.nimai.ucm.bean;
+
+public class UserCountryGoodBean {
+
+	
+	private String countriesIntrested;
+	private String blackListGoods;
+	
+	public String getCountriesIntrested() {
+		return countriesIntrested;
+	}
+	public void setCountriesIntrested(String countriesIntrested) {
+		this.countriesIntrested = countriesIntrested;
+	}
+	public String getBlackListGoods() {
+		return blackListGoods;
+	}
+	public void setBlackListGoods(String blackListGoods) {
+		this.blackListGoods = blackListGoods;
+	}
+	
+	
+	
+}

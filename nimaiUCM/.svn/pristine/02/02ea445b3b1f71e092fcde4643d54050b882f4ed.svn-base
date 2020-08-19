@@ -1,0 +1,150 @@
+package com.nimai.ucm.utility;
+
+import java.util.regex.Pattern;
+
+
+import org.jboss.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.nimai.ucm.bean.BusinessDetailsBean;
+import com.nimai.ucm.service.RegisterUserService;
+
+@Component
+public class BusinessDetailsValidator 
+{
+	@Autowired
+	RegisterUserService registerUser;
+	
+	static Logger logbusinessdetails = Logger.getLogger(BusinessDetailsBean.class.getName());
+	
+	public String Validation(BusinessDetailsBean businessDetailsBean)
+	{
+		boolean isUserIdExist = registerUser.checkUserId(businessDetailsBean.getUserId());
+		
+		 final Pattern COMPANYNAME = Pattern.compile("^[a-zA-Z@.]*$");
+		 final Pattern COUNTRY = Pattern.compile("^[a-zA-Z]*$");
+		 final Pattern DESIGNATION = Pattern.compile("^[a-zA-Z]*$");
+		 final Pattern OFFCADDRESS = Pattern.compile("\"([^\\\\\"]|\\\\\")*\"");
+		 final Pattern OFFCNUMBER = Pattern.compile("^[0-9]*$");
+		 final Pattern OWNERNAME = Pattern.compile("^[a-zA-Z]*$");
+		 final Pattern REGISTRATIONTYPE = Pattern.compile("^[a-zA-Z]*$");
+		 final Pattern TELEPHONE=Pattern.compile("^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$");
+		 final Pattern Alphanumeric=Pattern.compile("^[a-zA-Z0-9@]*$");
+		 final Pattern AlphanumericWithSpecialChar=Pattern.compile(	"^[-@.\\/#&+\\w\\s]*$");
+		 
+		 String returnStr = "";
+		 try {
+				if(!isUserIdExist) {
+					return "UserId is Not Exist";
+				}
+			 if((businessDetailsBean.getBankNbfcName()) ==null || (businessDetailsBean.getBankNbfcName().trim().isEmpty())) {
+				 return "please enter NBFC name";
+			 }
+			 if((businessDetailsBean.getBranchName())== null || (businessDetailsBean.getBranchName().trim().isEmpty())) {
+				 return "please enter Branch Name";
+			 }
+			 if((businessDetailsBean.getSwiftCode() ==null || (businessDetailsBean.getSwiftCode().trim().isEmpty()))) {
+				 return "please enter  swift code";
+			 }
+			 if((businessDetailsBean.getMinValuOfLC()==null || (businessDetailsBean.getMinValuOfLC().trim().isEmpty())) ) {
+				 return "please enter minimum value of LC";
+			 }
+			 if((businessDetailsBean.getDesignation())==null || (businessDetailsBean.getDesignation().trim().isEmpty())) {
+				 return "please enter designation";
+			 }
+			 if((businessDetailsBean.getProvinceName())==null || (businessDetailsBean.getProvinceName().trim().isEmpty())) {
+				 return "please enter the provincename";
+			 }
+			 if((businessDetailsBean.getOwnerName())==null || (businessDetailsBean.getOwnerName().trim().isEmpty())) {
+				 return "please enter the owner name";
+			 }
+			 if(businessDetailsBean.getRegistredOffice()==null) {
+				 return "please enter the registered office address";
+			 }
+			 
+//			 if((businessDetailsBean.getTelephone())==null || (businessDetailsBean.getTelephone().trim().isEmpty())) {
+//				 return "please enter the telephone number";
+//			 }
+//			 if((businessDetailsBean.getComapanyName().length() <= 3 ) || (businessDetailsBean.getComapanyName().length() >= 15)) {
+//				 return "Company Name should be greater then 3 characters and less then 15 characters";
+//			 }
+//			 if(!COMPANYNAME.matcher(businessDetailsBean.getComapanyName()).matches()) {
+//				 return "please enter alphabet only";
+//			 }
+//			 if((businessDetailsBean.getCountry()) == null || (businessDetailsBean.getCountry().trim().isEmpty())) {
+//				 return "please enter country name";
+//			 }
+//			 if((businessDetailsBean.getCountry().length() <= 3 ) || (businessDetailsBean.getCountry().length() >=15)) {
+//				 return "Country name should be greater then 3 characters and less then 15 characters";
+//			 }
+//			 if(!COUNTRY.matcher(businessDetailsBean.getCountry()).matches()) {
+//				 return "Country Name always only characters";
+//			 }
+//			 if((businessDetailsBean.getDesignation()) == null || (businessDetailsBean.getDesignation().trim().isEmpty())) {
+//				 return "please enter designation";
+//			 }
+//			 if((businessDetailsBean.getAddress2())==null || (businessDetailsBean.getAddress2().trim().isEmpty())) {
+//				 return "please enter the address";
+//			 }
+//			 if((businessDetailsBean.getAddress3())==null || (businessDetailsBean.getAddress3().trim().isEmpty())){
+//				 return "please enter address properly";
+//			 }
+//			 if((businessDetailsBean.getCity())==null || (businessDetailsBean.getCity().trim().isEmpty())) {
+//				 return "please enter city";
+//			 }
+//			 if((businessDetailsBean.getPincode())==null || (businessDetailsBean.getPincode().trim().isEmpty())) {
+//				 return "please enter pincode";
+//			 }
+//			 if((businessDetailsBean.getDesignation().length() <= 3) || (businessDetailsBean.getDesignation().length() >= 15)) {
+//				 return "Designation name should be greater then 3 characters and less then 15 characters";
+//			 }
+//			 if(!DESIGNATION.matcher(businessDetailsBean.getDesignation()).matches()) {
+//				 return "Designation always only characters";
+//			 }
+//			 if((businessDetailsBean.getAddress1()) == null || (businessDetailsBean.getAddress1().trim().isEmpty())) {
+//				 return "please enter office address";
+//			 }
+//			 if((businessDetailsBean.getOwnerName()) == null || (businessDetailsBean.getRegistrationType().trim().isEmpty())) {
+//				 return "please enter owner name";
+//			 }
+//			 if((businessDetailsBean.getOwnerName().length() <= 3) || (businessDetailsBean.getOwnerName().length() >= 15)) {
+//				 return "Owner Name must be greater then 3 characters and less then 15 characters";
+//			 }
+//			 if(!OWNERNAME.matcher(businessDetailsBean.getOwnerName()).matches()) {
+//				 return "please enter alphabet only";
+//			 }
+//			 if((businessDetailsBean.getRegistrationType()) == null || (businessDetailsBean.getRegistrationType().trim().isEmpty())) {
+//				 return "please enter registration type";
+//			 }
+//			 if((businessDetailsBean.getRegistrationType().length() <= 3 ) || (businessDetailsBean.getRegistrationType().length() >= 15)) {
+//				 return "Registration Type must be greater then 3 characters and less then 15 characters";
+//			 }
+//			 if(!REGISTRATIONTYPE.matcher(businessDetailsBean.getRegistrationType()).matches()) {
+//				 return "Registration Type always only characters";
+//			 }
+//			 if(!TELEPHONE.matcher(businessDetailsBean.getTelephone()).matches()) {
+//				 return "Enter proper telephone number";
+//			 }
+//			 if(!AlphanumericWithSpecialChar.matcher(businessDetailsBean.getBankNbfcName()).matches()) {
+//				 return "please enter alphanumeric character for nbfcName";
+//			 }
+//			 if(!Alphanumeric.matcher(businessDetailsBean.getDesignation()).matches()) {
+//				 return "please enter alphanumeric character";
+//			 }
+//			 if(!AlphanumericWithSpecialChar.matcher(businessDetailsBean.getBranchName()).matches()) {
+//				 return "please enter alphanumeric character";
+//			 }
+//			 if(!Alphanumeric.matcher(businessDetailsBean.getSwiftCode()).matches()) {
+//				 return "please enter alphanumeric character";
+//			 }
+//			 
+			 returnStr = "Success";
+		 }
+		 catch(Exception e) {
+			 e.printStackTrace();
+			 returnStr = "Failed : " + e.getMessage();
+		 }
+		 return returnStr;
+	}
+}

@@ -1,0 +1,28 @@
+#Validations
+subscriberType=Subscriber type always only characters.
+firstName=First Name always only characters.
+lastName=Last Name always only characters.
+emaiAddress=Email Address is invalid.
+mobileNum=Mobile always only digits.
+countryName=Country Name only characters
+password=Password always only characters.
+retypePassword=Retype Password always only characters.
+
+
+# Security Check Details
+#ValidChar=[A-Za-z0-9.@_#:,'/\\() ]+
+
+
+#Hibernate
+hibernate.dialect: org.hibernate.dialect.Oracle10gDialect
+hibernate.show_sql: true
+hibernate.hbm2ddl.auto: 
+entitymanager.packagesToScan: com.nimai.ucm.entity
+#spring.jpa.properties.hibernate.format_sql=true
+
+
+#DB properties
+spring.datasource.url:jdbc:oracle:thin:@192.168.2.182:1521:csat
+spring.datasource.username:nimai
+spring.datasource.password:nimai
+spring.datasource.driver-class:oracle.jdbc.driver.OracleDriver

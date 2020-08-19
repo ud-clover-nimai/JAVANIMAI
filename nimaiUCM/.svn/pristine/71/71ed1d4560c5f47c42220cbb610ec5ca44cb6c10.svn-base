@@ -1,0 +1,29 @@
+package com.nimai.ucm.service;
+
+import com.nimai.ucm.bean.BusinessDetailsBean;
+import com.nimai.ucm.bean.PersonalDetailsBean;
+import com.nimai.ucm.entity.NimaiMLogin;
+
+
+public interface RegisterUserService {
+
+	public PersonalDetailsBean saveRegisterDetails(PersonalDetailsBean personDetailsBean);
+
+	public boolean updatePersonDetailBean(String userId,BusinessDetailsBean businessDetailsBean);
+	
+	public BusinessDetailsBean findUserById(String userId);
+
+	public BusinessDetailsBean getBusinessDetails(String userId);
+
+	public boolean checkEmailId(String emailId);
+	
+	public NimaiMLogin saveUserCredentials(NimaiMLogin loginEntity);
+
+	NimaiMLogin saveUserCredentials();
+
+	boolean checkUserId(String userId);
+
+	
+	
+
+}

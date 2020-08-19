@@ -1,0 +1,150 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.nimai.ucm.entity;
+
+import java.io.Serializable;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+/**
+ *
+ * @author sahadeo.naik
+ */
+@Entity
+@Table(name = "NIMAI_F_COUNTRYGOOD")
+@SequenceGenerator(sequenceName = "LOGIN_SEQ", name = "LOGIN_SEQ", allocationSize = 1)
+public class NimaiFCountrygood implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    @Size(max = 20)
+    @Column(name = "COUNTRIES_INTRESTED")
+    private String countriesIntrested;
+    
+    @Size(max = 20)
+    @Column(name = "BLACK_LIST_GOODS")
+    private String blackListGoods;
+    
+    @Column(name = "INSERTED_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date insertedDate;
+    
+    @Column(name = "MODIFIED_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date modifiedDate;
+    
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Id
+    @Basic(optional = false)
+    @NotNull
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "LOGIN_SEQ")
+    @Column(name = "NIMAI_F_CUSTID")
+    private BigDecimal nimaiFCustid;
+    
+    @JoinColumn(name = "USERID", referencedColumnName = "USERID")
+    @ManyToOne(optional = false)
+    private NimaiClient userid;
+
+    
+    
+    public String getCountriesIntrested() {
+		return countriesIntrested;
+	}
+
+	public void setCountriesIntrested(String countriesIntrested) {
+		this.countriesIntrested = countriesIntrested;
+	}
+
+	public String getBlackListGoods() {
+		return blackListGoods;
+	}
+
+	public void setBlackListGoods(String blackListGoods) {
+		this.blackListGoods = blackListGoods;
+	}
+
+	public NimaiFCountrygood() {
+    }
+
+    public NimaiFCountrygood(BigDecimal nimaiFCustid) {
+        this.nimaiFCustid = nimaiFCustid;
+    }
+
+	public Date getInsertedDate() {
+        return insertedDate;
+    }
+
+    public void setInsertedDate(Date insertedDate) {
+        this.insertedDate = insertedDate;
+    }
+
+    public Date getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Date modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public BigDecimal getNimaiFCustid() {
+        return nimaiFCustid;
+    }
+
+    public void setNimaiFCustid(BigDecimal nimaiFCustid) {
+        this.nimaiFCustid = nimaiFCustid;
+    }
+
+    public NimaiClient getUserid() {
+        return userid;
+    }
+
+    public void setUserid(NimaiClient userid) {
+        this.userid = userid;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (nimaiFCustid != null ? nimaiFCustid.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof NimaiFCountrygood)) {
+            return false;
+        }
+        NimaiFCountrygood other = (NimaiFCountrygood) object;
+        if ((this.nimaiFCustid == null && other.nimaiFCustid != null) || (this.nimaiFCustid != null && !this.nimaiFCustid.equals(other.nimaiFCustid))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "in.nimai.NimaiFCountrygood[ nimaiFCustid=" + nimaiFCustid + " ]";
+    }
+
+	
+}

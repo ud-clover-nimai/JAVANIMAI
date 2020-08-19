@@ -1,0 +1,113 @@
+package com.nimai.ucm.utility;
+
+import java.util.regex.Pattern;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import com.nimai.ucm.bean.PersonalDetailsBean;
+import com.nimai.ucm.service.RegisterUserService;
+
+
+
+@Component
+public class RegisterUserValidator {
+	
+	@Autowired
+	RegisterUserService registerUser;
+
+	public String Validation(PersonalDetailsBean personDetailsBean) {
+		
+		boolean isEmailExist = registerUser.checkEmailId(personDetailsBean.getEmailAddress());
+		
+		
+		final Pattern COUNTRY_NAME = Pattern.compile("^[a-zA-Z]*$");
+		final Pattern EMAIADDRESS = Pattern.compile("^(.+)@(.+)$");
+		final Pattern FIRSTNAME = Pattern.compile("[a-zA-Z]*$");
+		final Pattern LASTNAME = Pattern.compile("^[a-zA-Z]*$");
+		final Pattern MOBILENUM = Pattern.compile("^[0-9]*$");
+		final Pattern SUBSCRIBERTYPE = Pattern.compile("^[a-zA-Z]*$");
+		//final Pattern LANDLINENUMBER = Pattern.compile("^[0-9]*$");
+
+		String returnStr = "";
+		try {
+			
+			if(isEmailExist) {
+				return "Email Alreay exist";
+			}
+		
+			if ((personDetailsBean.getCountryName() == null) || (personDetailsBean.getCountryName().trim().isEmpty())) {
+				return "Please enter country name";
+			}
+			if (!COUNTRY_NAME.matcher(personDetailsBean.getCountryName()).matches()) {
+				return "Country name always only characters";
+			}
+			if ((personDetailsBean.getCountryName().length() <= 2) || (personDetailsBean.getCountryName().length() > 15)) {
+				return "Country Name should be greater then 3 characters and less then 15 characters";
+			}
+			if ((personDetailsBean.getEmailAddress() == null) || (personDetailsBean.getEmailAddress().trim().isEmpty())) {
+				return "Please enter email address";
+			}
+			if (!EMAIADDRESS.matcher(personDetailsBean.getEmailAddress()).matches()) {
+				return "Please enter valid email address";
+			}
+		
+			if ((personDetailsBean.getFirstName() == null) || (personDetailsBean.getFirstName().trim().isEmpty())) {
+				return "Please enter first name";
+			}
+			if (!FIRSTNAME.matcher(personDetailsBean.getFirstName()).matches()) {
+				return "No Space Allowed in Firstname";
+			}
+			if ((personDetailsBean.getFirstName().length() <= 2) || (personDetailsBean.getFirstName().length() > 15)) {
+				return "First Name should be greater then 3 characters and less then 15 characters";
+			}
+			if ((personDetailsBean.getLastName() == null) || (personDetailsBean.getLastName().trim().isEmpty())) {
+				return "Please enter last name";
+			}
+			if (!LASTNAME.matcher(personDetailsBean.getLastName()).matches()) {
+				return "Last Name always only characters, No Space Allowed";
+			}
+			if ((personDetailsBean.getLastName().length() <= 2) || (personDetailsBean.getLastName().length() > 15)) {
+				return "Last Name should be greater then 3 characters and less then 15 characters";
+			}
+			if ((personDetailsBean.getMobileNum() == null) || (personDetailsBean.getMobileNum().trim().isEmpty())) {
+				return "Please enter Mobile Number";
+			}
+			if (!MOBILENUM.matcher(personDetailsBean.getMobileNum()).matches()) {
+				return "Mobile Number always only digits";
+			}
+			if ((personDetailsBean.getMobileNum().length() != 10)) {
+				return "Mobile Number must be 10 digits";
+			}
+			if ((personDetailsBean.getSubscriberType() == null) || (personDetailsBean.getSubscriberType().trim().isEmpty())) {
+				return "Please enter Subscriber Type";
+			}
+			if (!SUBSCRIBERTYPE.matcher(personDetailsBean.getSubscriberType()).matches()) {
+				return "Subcriber Type always only characters";
+			}
+			if ((personDetailsBean.getSubscriberType().length() < 3) || (personDetailsBean.getSubscriberType().length() > 15)) {
+				return "Subscriber type should be greater then 3 characters and less then 15 characters";
+			}
+			if(! ((personDetailsBean.getSubscriberType().equalsIgnoreCase("CUSTOMER")) || (personDetailsBean.getSubscriberType().equalsIgnoreCase("BANK")) || (personDetailsBean.getSubscriberType().equalsIgnoreCase("REFERRER"))))
+			{	
+				return "Invalid Subscriber Type ";
+			}
+			if((personDetailsBean.getSubscriberType().equalsIgnoreCase("REFERRER")) && ((personDetailsBean.getCompanyName() == null) || (personDetailsBean.getCompanyName().trim().isEmpty())))
+				{
+					return "Company Name can't be left empty. ";
+				}
+			if((personDetailsBean.getSubscriberType().equalsIgnoreCase("REFERRER")) && (personDetailsBean.getDesignation() == null || (personDetailsBean.getDesignation().trim().isEmpty())))
+				{
+					return "Designation can't be left empty. ";
+				}
+			if((personDetailsBean.getSubscriberType().equalsIgnoreCase("REFERRER")) && (personDetailsBean.getBusinessType() == null || (personDetailsBean.getBusinessType().trim().isEmpty())))
+				{
+					return "BusinessType can't be left empty. ";
+				}
+			returnStr = "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			returnStr = "Failed : " + e.getMessage();
+		}
+			return returnStr;
+	}
+}

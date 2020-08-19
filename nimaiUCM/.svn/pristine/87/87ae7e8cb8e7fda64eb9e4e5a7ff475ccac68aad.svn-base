@@ -1,0 +1,124 @@
+package com.nimai.ucm.bean;
+
+import java.io.Serializable;
+
+public class PersonalDetailsBean implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private String subscriberType;
+	private String firstName;
+	private String lastName;
+	private String emailAddress;
+	private String mobileNum;
+	private String countryName;
+	private String landLinenumber;
+	private String companyName;
+	private String designation;
+	private String businessType;
+	private String userId;
+	private String bankType;
+	
+	public String getUserId() {
+		return userId;
+	}
+
+	public String getBankType() {
+		return bankType;
+	}
+
+	public void setBankType(String bankType) {
+		this.bankType = bankType;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getSubscriberType() {
+		return subscriberType;
+	}
+
+	public void setSubscriberType(String subscriberType) {
+		this.subscriberType = subscriberType;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmaiAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
+	}
+
+	public String getMobileNum() {
+		return mobileNum;
+	}
+
+	public void setMobileNum(String mobileNum) {
+		this.mobileNum = mobileNum;
+	}
+
+	public String getCountryName() {
+		return countryName;
+	}
+
+	public void setCountryName(String countryName) {
+		this.countryName = countryName;
+	}
+
+	public String getLandLinenumber() {
+		return landLinenumber;
+	}
+
+	public void setLandLinenumber(String landLinenumber) {
+		this.landLinenumber = landLinenumber;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(String designation) {
+		this.designation = designation;
+	}
+
+	public String getBusinessType() {
+		return businessType;
+	}
+
+	public void setBusinessType(String businessType) {
+		this.businessType = businessType;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
+	}
+
+	
+	
+}

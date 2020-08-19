@@ -1,0 +1,10 @@
+package com.nimai.ucm.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+
+import com.nimai.ucm.entity.NimaiFCountrygood;
+
+public interface ForeignCountryGoodRepository extends JpaRepository<NimaiFCountrygood, Integer> {
+
+}

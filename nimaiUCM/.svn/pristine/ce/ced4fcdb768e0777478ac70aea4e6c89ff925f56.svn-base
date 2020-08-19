@@ -1,0 +1,22 @@
+package com.nimai.ucm.bean;
+
+public class FcustomerResponse {
+	
+	private String countriesIntrested;
+	private String blcckListGoods;
+	public String getCountriesIntrested() {
+		return countriesIntrested;
+	}
+	public void setCountriesIntrested(String countriesIntrested) {
+		this.countriesIntrested = countriesIntrested;
+	}
+	public String getBlcckListGoods() {
+		return blcckListGoods;
+	}
+	public void setBlcckListGoods(String blcckListGoods) {
+		this.blcckListGoods = blcckListGoods;
+	}
+
+	
+
+}

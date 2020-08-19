@@ -1,0 +1,151 @@
+package com.nimai.ucm.controller;
+
+import org.jboss.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.nimai.ucm.bean.BusinessDetailsBean;
+import com.nimai.ucm.bean.GenericResponse;
+import com.nimai.ucm.bean.PersonalDetailsBean;
+import com.nimai.ucm.service.RegisterUserService;
+import com.nimai.ucm.utility.BusinessDetailsValidator;
+import com.nimai.ucm.utility.ErrorDescription;
+import com.nimai.ucm.utility.RegisterUserValidator;
+import com.nimai.ucm.utility.RegistrationId;
+
+
+
+@RestController
+@RequestMapping("/UserDetails")
+public class UserDetailController {
+
+	static Logger logger = Logger.getLogger(UserDetailController.class.getName());
+
+	GenericResponse<Object> response = new GenericResponse<Object>();
+
+	@Autowired
+	RegisterUserValidator registerUserValidator;
+
+	@Autowired
+	BusinessDetailsValidator businessDetailsValidator;
+	
+	@Autowired
+	RegisterUserService registerUser;
+
+	@Autowired
+	RegistrationId register;
+	
+	/*----------------- Method For Personal Details ---------------------*/
+	@CrossOrigin("*")
+	@PostMapping(value = "/registerUser", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> registerUser(@RequestBody PersonalDetailsBean personDetailsBean)
+
+	{
+		logger.info(" ================ UserDetail Controller ================");
+				
+		String errorString = this.registerUserValidator.Validation(personDetailsBean);
+	
+		if (errorString.equalsIgnoreCase("success")) {
+			try {			
+				personDetailsBean = registerUser.saveRegisterDetails(personDetailsBean);
+				response.setData(personDetailsBean);
+				response.setErrCode("ASA001");
+				response.setMessage(ErrorDescription.getDescription("ASA001"));
+				return new ResponseEntity<Object>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				response.setErrCode("EXE000");
+				response.setMessage(ErrorDescription.getDescription("EXE000") + e.getMessage());
+				return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			response.setErrCode("EXE000");
+			response.setMessage(ErrorDescription.getDescription("EXE000") + errorString.toString());
+		}
+		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+	}
+
+	/*---------------------- Method For Update Business Detail -----------------------*/
+	@CrossOrigin("*")
+	@PostMapping(value = "/updateBusinessDetails/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> updateBusinessDetail(@RequestBody BusinessDetailsBean businessDetailsBean) {
+
+		logger.info(" ============== UserDetail : Business Details ============== " );
+		
+		if(businessDetailsBean.getUserId().toString().substring(0,2).equalsIgnoreCase("RE"))
+		{
+			response.setErrCode("ASA005");
+			response.setMessage(ErrorDescription.getDescription("ASA005"));
+			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+		}
+		
+		String errorString = this.businessDetailsValidator.Validation(businessDetailsBean);
+		
+		logger.info("======== UserDetail : Business Details Validation ========== " + errorString);
+
+		if (errorString.equalsIgnoreCase("success")) {
+			try {
+				boolean status = registerUser.updatePersonDetailBean(businessDetailsBean.getUserId(),businessDetailsBean);
+				response.setErrCode("ASA002");
+				response.setMessage(ErrorDescription.getDescription("ASA002"));
+				return new ResponseEntity<Object>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				response.setErrCode("EXE000");
+				response.setMessage(ErrorDescription.getDescription("EXE000") + e.getMessage());
+				return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			response.setErrCode("EXE000");
+			response.setMessage(ErrorDescription.getDescription("EXE000") + errorString.toString());
+		}
+		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+	}
+
+	/*---------------------- Method For View Business Detail -----------------------*/
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@RequestMapping(value = "/viewBusinessDetails/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public ResponseEntity<Object> viewBusinessDetails(@PathVariable String userId) {
+
+		try {
+			BusinessDetailsBean businessDetailsBean = registerUser.findUserById(userId);
+			response.setData(businessDetailsBean);
+			return new ResponseEntity<Object>(response, HttpStatus.OK);
+		} catch (Exception exception) {
+			response.setErrCode("EXE000");
+			response.setMessage(ErrorDescription.getDescription("EXE000") + exception.getMessage());
+			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	/*---------------------- Validate Email ID Exists -----------------------*/
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@RequestMapping(value = "/checkEmailID", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public ResponseEntity<Object> checkEmailID(@RequestBody PersonalDetailsBean personalDetailsBean) {
+		try {
+			boolean status = registerUser.checkEmailId(personalDetailsBean.getEmailAddress());
+			if (status == true) {
+				response.setErrCode("ASA003");
+				response.setMessage(ErrorDescription.getDescription("ASA003"));
+				return new ResponseEntity<Object>(response, HttpStatus.OK);
+			} else {
+				response.setErrCode("ASA004");
+				response.setMessage(ErrorDescription.getDescription("ASA004"));
+				return new ResponseEntity<Object>(response, HttpStatus.OK);
+			}
+		} catch (Exception exception) {
+			response.setErrCode("EXE000");
+			response.setMessage(ErrorDescription.getDescription("EXE000") + exception.getMessage());
+			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+		}
+
+	}
+}
+	
