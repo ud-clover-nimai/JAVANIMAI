@@ -10,18 +10,22 @@ import org.springframework.stereotype.Service;
 
 import com.nimai.ucm.bean.CountryResponse;
 import com.nimai.ucm.bean.StateResponce;
+import com.nimai.ucm.entity.Countries;
 import com.nimai.ucm.entity.NimaiLookupCountries;
-import com.nimai.ucm.repository.NimaiLookupCountriesRepository;
 
+import com.nimai.ucm.repository.NimaiLookupCountriesRepository;
 
 @Service
 public class CountryServiceImpl implements CountryService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CountryServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RegisterServiceImpl.class);
+
+	
 
 	@Autowired
 	NimaiLookupCountriesRepository nimaiLookupCountriesRepository;
 
+	// Working oNe
 	public List<?> countryData() {
 		List<NimaiLookupCountries> list = nimaiLookupCountriesRepository.findAll();
 
@@ -29,6 +33,7 @@ public class CountryServiceImpl implements CountryService {
 			CountryResponse countryData = new CountryResponse();
 			countryData.setCountryId(request.getCountryId());
 			countryData.setCountryName(request.getCountryName());
+			countryData.setPhoneCode(request.getPhoneCode());
 			countryData.setCurrency(request.getCurrency());
 			List<StateResponce> stateList = request.getNimaiLookupStatesList().stream().map(stateReq -> {
 				StateResponce stateResponse = new StateResponce();
