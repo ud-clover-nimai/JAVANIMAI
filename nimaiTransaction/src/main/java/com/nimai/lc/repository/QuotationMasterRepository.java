@@ -25,9 +25,12 @@ public interface QuotationMasterRepository extends JpaRepository<QuotationMaster
 	@Query(value="SELECT * from get_all_quotation where userid=(:userId)", nativeQuery = true )
 	List<QuotationMaster> findAllQuotationByUserId(@Param("userId") String userId);
 	
-	@Query(value="SELECT * from get_all_quotation where userid=(:userId) and transaction_id=(:transactionId)", nativeQuery = true )
+	@Query(value="SELECT * from get_all_quotation where userid=(:userId) and transaction_id=(:transactionId) and (quotation_status NOT IN ('Rejected','Expired') OR quotation_status IS NULL)", nativeQuery = true )
 	List<QuotationMaster> findAllQuotationByUserIdAndTransactionId(@Param("userId") String userId,@Param("transactionId") String transactionId);
 
+	@Query(value="SELECT * from get_all_quotation where userid=(:userId) and transaction_id=(:transactionId) and quotation_status=(:status)", nativeQuery = true )
+	List<QuotationMaster> findQuotationByUserIdAndTransactionIdStatus(@Param("userId") String userId,@Param("transactionId") String transactionId,@Param("status") String status);
+	
 	@Query(value="SELECT * from get_all_quotation where quotation_id=(:quotationId)", nativeQuery = true )
 	List<QuotationMaster> findAllQuotationByQuotationId(Integer quotationId);
 
