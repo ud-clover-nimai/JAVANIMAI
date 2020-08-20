@@ -78,6 +78,33 @@ public class TransactionQuotationBean {
 	private Float totalQuoteValue;
 	private Date validityDate;
 	private String quotationStatus;
+	private Integer quoteRank;
+	private Date insertedDate;
+	private Date modifiedDate;
+	
+	public Date getInsertedDate() {
+		return insertedDate;
+	}
+
+	public void setInsertedDate(Date insertedDate) {
+		this.insertedDate = insertedDate;
+	}
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+
+	public Integer getQuoteRank() {
+		return quoteRank;
+	}
+
+	public void setQuoteRank(Integer quoteRank) {
+		this.quoteRank = quoteRank;
+	}
 
 	public String getQuotationStatus() {
 		return quotationStatus;

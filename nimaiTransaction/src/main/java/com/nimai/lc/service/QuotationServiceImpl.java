@@ -506,6 +506,9 @@ public class QuotationServiceImpl implements QuotationService {
 			responseBean.setTotalQuoteValue(((Object[])objA)[69]==null?0:Float.valueOf(((Object[])objA)[69].toString()));
 			responseBean.setValidityDate(((Object[])objA)[70]==null?new Date(0):(Date)simpleDateFormat.parse(((Object[])objA)[70].toString()));
 			responseBean.setQuoteRank(((Object[])objA)[72]==null?0:Integer.valueOf(((Object[])objA)[72].toString()));
+			responseBean.setInsertedDate(((Object[])objA)[73]==null?new Date(0):(Date)simpleDateFormat.parse(((Object[])objA)[73].toString()));
+			responseBean.setModifiedDate(((Object[])objA)[74]==null?new Date(0):(Date)simpleDateFormat.parse(((Object[])objA)[74].toString()));
+			
 			list1.add(responseBean);
 		}
 		return list1;
