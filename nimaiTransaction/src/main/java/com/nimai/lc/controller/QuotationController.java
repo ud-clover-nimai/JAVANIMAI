@@ -351,6 +351,29 @@ public class QuotationController
 	}
 	
 	@CrossOrigin(value = "*", allowedHeaders = "*")
+	@RequestMapping(value = "/getQuoteByUserIdTxnIdStatus", produces = "application/json", method = RequestMethod.POST)
+	public ResponseEntity<?> getQuoteDetailByUserIdAndTransactionId(@RequestBody QuotationBean quotationbean) {
+		logger.info("=========== Get all Quotation Received By UserId and TransactionId ===========");
+		GenericResponse response = new GenericResponse<>();
+		String transactionId = quotationbean.getTransactionId();
+		String userId=quotationbean.getUserId();
+		String status=quotationbean.getQuotationStatus();
+		System.out.println(""+transactionId);
+		System.out.println(""+userId);
+		List<QuotationMaster> quotations = quotationService.getQuotationDetailByUserIdAndTransactionIdStatus(userId,transactionId,status);
+		
+		if (quotations == null || quotations.isEmpty()) {
+			response.setStatus("Failure");
+			response.setErrCode("ASA004");
+			response.setErrMessage(ErrorDescription.getDescription("ASA004"));
+			return new ResponseEntity<Object>(response, HttpStatus.OK);
+		} else {
+			response.setData(quotations);
+			return new ResponseEntity<Object>(response, HttpStatus.OK);
+		}
+	}
+	
+	@CrossOrigin(value = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/getQuotationDtlByQId", produces = "application/json", method = RequestMethod.POST)
 	public ResponseEntity<?> getAllQuotationByQuotationId(@RequestBody QuotationBean quotationbean) {
 		logger.info("=========== Get Quotation By QuotationId ===========");
@@ -494,7 +517,7 @@ public class QuotationController
 		System.out.println(""+bankUserId);
 		//List<TransactionQuotationBean> quotations = quotationService.getTransactionQuotationDetailByBankUserIdAndStatus(bankUserId,quotationPlaced,transactionStatus);
 		List<TransactionQuotationBean> quotations = quotationService.getTransactionQuotationDetailByBankUserIdAndStatus(bankUserId,quotationStatus);
-		if (quotations == null) {
+		if (quotations.isEmpty()) {
 			response.setStatus("Failure");
 			response.setErrCode("ASA004");
 			response.setErrMessage(ErrorDescription.getDescription("ASA004"));

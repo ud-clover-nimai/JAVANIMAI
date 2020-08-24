@@ -41,7 +41,7 @@ public interface QuotationRepository extends JpaRepository<Quotation, Integer>
 	@Query(value="SELECT * from get_all_draft_quotation where bank_userid=(:bankUserId)", nativeQuery = true )
 	List<Quotation> findAllDraftQuotationByBankUserId(@Param("bankUserId") String bankUserId);
 	
-	@Query(value="SELECT * from get_draft_trans_quote_for_bank where quotation_placed is null and transaction_status='Active' and bank_userid=(:bankUserId)", nativeQuery = true )
+	@Query(value="SELECT * from get_draft_trans_quote_for_bank where transaction_status='Active' and bank_userid=(:bankUserId)", nativeQuery = true )
 	List findDraftTransQuotationBybankUserId(String bankUserId);
 
 	@Query(value="SELECT q from Quotation q where transactionId=(:transId) and userId=(:userId) and bankUserId=(:bankUserId)")
