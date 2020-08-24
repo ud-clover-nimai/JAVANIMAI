@@ -44,5 +44,5 @@ public interface QuotationService
 	public QuotationMaster getDetailsOfAcceptedTrans(String transId, String userId);
 	public Integer getRejectedQuotationByTransactionId(String transactionId);
 	public void updateQuotationStatusToActiveOrPlaced(Integer qid, String transactionId) throws ParseException;
-	
+	public List<QuotationMaster> getQuotationDetailByUserIdAndTransactionIdStatus(String userId, String transactionId,String status);
 }

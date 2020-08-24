@@ -4,9 +4,18 @@ import java.util.List;
 
 public class CountryResponse {
 
-	private String countryName;
-	private String currency;
 	private Integer countryId;
+	private String countryName;
+	private String phoneCode;
+	public String getPhoneCode() {
+		return phoneCode;
+	}
+
+	public void setPhoneCode(String phoneCode) {
+		this.phoneCode = phoneCode;
+	}
+
+	private String currency;
 	private List<StateResponce> stateResponce;
 
 	public String getCountryName() {
