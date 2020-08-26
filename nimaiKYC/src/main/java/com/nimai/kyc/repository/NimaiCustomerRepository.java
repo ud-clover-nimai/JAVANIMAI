@@ -1,5 +1,7 @@
 package com.nimai.kyc.repository;
 
+
+import java.util.Date;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -24,5 +26,10 @@ public interface NimaiCustomerRepository extends JpaRepository<NimaiMCustomer, S
 	@Transactional
 	@Query("update NimaiMCustomer c set c.kycStatus= ?1 WHERE c.userid= ?2")
 	void updateKycStatus(String kycStatus,String userId);
+
+	@Modifying
+	@Transactional
+	@Query("update NimaiMCustomer c set c.kycStatus= ?1,c.kycApprovedDate= ?2 WHERE c.userid= ?3")
+	void updateKycStatus(String status, Date today,String userid);
  
 }

@@ -14,6 +14,8 @@ import com.nimai.kyc.payload.kycBase64Request;
 public class kycValidator {
 	private static Logger logger = LoggerFactory.getLogger(kycValidator.class);
 
+
+
 	public String kycRequestValidator(kycBase64Request kycDoc) {
 
 		String returnString = null;

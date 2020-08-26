@@ -1,62 +1,57 @@
 package com.nimai.kyc.util;
 
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.nimai.kyc.model.NimaiFKyc;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.nimai.kyc.model.NimaiKyc;
 import com.nimai.kyc.payload.BusinessKycList;
-import com.nimai.kyc.payload.KycResponse;
 import com.nimai.kyc.payload.PersonalKycList;
+import com.nimai.kyc.repository.NimaiCustomerRepository;
+import com.nimai.kyc.repository.NimaiKycBase64Repository;
 
 public class ModelMapper {
 
-	public static KycResponse mapKycDetailsToKycResponse(NimaiFKyc fKyc) {
-		KycResponse kycResponse = new KycResponse();
-		kycResponse.setFileName(fKyc.getFileName());
-		kycResponse.setFileType(fKyc.getFileType());
-		// kycResponse.setKycid(fKyc.getKycid());
-		kycResponse.setUserid(fKyc.getUserid().getUserid());
-		kycResponse.setUserName(fKyc.getUserid().getFirstName());
+	@Autowired
+	NimaiCustomerRepository nimaiCustomerRepository;
 
-		return kycResponse;
-
-	}
-
-	public static Object mapKycDetailsToKycStatus(NimaiFKyc kycStatus) {
-		NimaiFKyc response = new NimaiFKyc();
-		response.setReason(kycStatus.getReason());
-		response.setApprovalDate(kycStatus.getApprovalDate());
-		response.setCheckedBy(kycStatus.getCheckedBy());
-		return response;
-	}
+	@Autowired
+	NimaiKycBase64Repository kycRepository;
 
 	public static NimaiKyc convertEntityKycRequestToDbObj(BusinessKycList mapper, NimaiKyc nimaiKycDoc) {
 		Calendar cal = Calendar.getInstance();
 		Date today = cal.getTime();
 		nimaiKycDoc.setCountry(mapper.getCountry());
-		nimaiKycDoc.setTitle("Business Kyc");
+		nimaiKycDoc.setTitle("Business");
 		nimaiKycDoc.setEncodedFileContent(mapper.getEncodedFileContent());
 		nimaiKycDoc.setInsertedDate(today);
 		nimaiKycDoc.setDocumentName(mapper.getDocumentName());
 		nimaiKycDoc.setDocumentType(mapper.getDocumentType());
-		nimaiKycDoc.setKycStatus("0");
+		nimaiKycDoc.setKycStatus("Pending");
 
 		return nimaiKycDoc;
 
+	}
+
+	public String EncrtyptedData(String text) {
+		text = Base64.getEncoder().encodeToString(text.getBytes()).toString();
+		return text;
 	}
 
 	public static NimaiKyc convertEntityKycRequestToDbObj(PersonalKycList mapper, NimaiKyc nimaiKycDoc) {
 		Calendar cal = Calendar.getInstance();
 		Date today = cal.getTime();
 		nimaiKycDoc.setCountry(mapper.getCountry());
-		nimaiKycDoc.setTitle("Personal Kyc");
+		nimaiKycDoc.setTitle("Personal");
 		nimaiKycDoc.setEncodedFileContent(mapper.getEncodedFileContent());
 		nimaiKycDoc.setInsertedDate(today);
 		nimaiKycDoc.setDocumentName(mapper.getDocumentName());
 		nimaiKycDoc.setDocumentType(mapper.getDocumentType());
-		nimaiKycDoc.setKycStatus("0");
+		nimaiKycDoc.setKycStatus("Pending");
 
 		return nimaiKycDoc;
 	}
+
 }

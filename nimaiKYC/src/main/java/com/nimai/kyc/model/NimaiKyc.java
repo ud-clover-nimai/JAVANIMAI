@@ -1,5 +1,6 @@
 package com.nimai.kyc.model;
 
+import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.Basic;
@@ -65,6 +66,18 @@ public class NimaiKyc {
 
 	@Column(name = "approved_date")
 	private Date approvedDate;
+
+	
+	
+	
+	
+
+
+
+
+
+
+
 
 	/**
 	 * @return the custUserId
@@ -284,5 +297,17 @@ public class NimaiKyc {
 				+ ", insertedDate=" + insertedDate + ", modifiedBy=" + modifiedBy + ", modifiedDate=" + modifiedDate
 				+ ", approvedBy=" + approvedBy + ", approvedDate=" + approvedDate + "]";
 	}
+
+	public Collection<NimaiKyc> kycList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	
+
+
+	
 
 }
