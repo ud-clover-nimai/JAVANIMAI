@@ -17,7 +17,42 @@ private String message;
 	 
 	private Map map;
 	
+	private String status;
+	
+	private String errMessage;
+	
 	private String errCode ;
+
+	
+	
+	
+	/**
+	 * @return the status
+	 */
+	public String getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the errMessage
+	 */
+	public String getErrMessage() {
+		return errMessage;
+	}
+
+	/**
+	 * @param errMessage the errMessage to set
+	 */
+	public void setErrMessage(String errMessage) {
+		this.errMessage = errMessage;
+	}
 
 	public String getErrCode() {
 		return errCode;

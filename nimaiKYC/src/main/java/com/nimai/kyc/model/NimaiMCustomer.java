@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -48,12 +49,12 @@ public class NimaiMCustomer implements Serializable {
 
 	@Basic(optional = false)
 	@NotNull
-	@Column(name = "EMAIL_ADDRESS")
+	@Size(min = 1, max = 30)
 	private String emailAddress;
 
 	@Basic(optional = false)
 	@NotNull
-	@Column(name = "MOBILE_NUMBER")
+	@Size(min = 1, max = 20)
 	private String mobileNumber;
 
 	@Column(name = "COUNTRY_NAME")
@@ -71,14 +72,6 @@ public class NimaiMCustomer implements Serializable {
 	@Column(name = "BUSINESS_TYPE")
 	private String businessType;
 
-	@Column(name = "INSERTED_DATE")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date insertedDate;
-
-	@Column(name = "MODIFIED_DATE")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date modifiedDate;
-
 	@Column(name = "BANK_NAME")
 	private String bankNbfcName;
 
@@ -88,11 +81,11 @@ public class NimaiMCustomer implements Serializable {
 	@Column(name = "SWIFT_CODE")
 	private String swiftCode;
 
-	@Column(name = "TELEPHONE")
-	private String telephone;
-
 	@Column(name = "MIN_VALUEOF_LC")
 	private String minValueofLc;
+
+	@Column(name = "TELEPHONE")
+	private String telephone;
 
 	@Column(name = "REGISTRATION_TYPE")
 	private String registrationType;
@@ -115,20 +108,80 @@ public class NimaiMCustomer implements Serializable {
 	@Column(name = "PINCODE")
 	private String pincode;
 
-	// Changes by Shubham Patil
+	@Column(name = "REGISTERED_COUNTRY")
+	private String rgistredCountry;
+
+	@Column(name = "IS_REGISTER")
+	private Integer isRegister;
+
+	@Column(name = "IS_RMASSIGNED")
+	private Integer isRmassigned;
+
+	@Column(name = "RM_ID")
+	private String rmId;
+
+	@Column(name = "IS_BDETAILSFILLED")
+	private Integer isBdetailsfilled;
+
+	@Column(name = "IS_SPLANPURCHASED")
+	private Integer isSplanPurchased;
+
+	@Column(name = "MODE_OF_PAYMENT")
+	private String modeOfPayment;
+
+	@Column(name = "PAYMENT_STATUS")
+	private String paymentStatus;
+
+	@Column(name = "PAYMENT_DATE")
+	private Date paymentDate;
+
 	@Column(name = "KYC_STATUS")
 	private String kycStatus;
 
 	@Column(name = "KYC_APPROVALDATE")
-	private Date kycApprovalDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date kycApprovedDate;
+
+	@Column(name = "INSERTED_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date insertedDate;
+
+	@Column(name = "MODIFIED_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date modifiedDate;
+
+	@Column(name = "ACCOUNT_TYPE")
+	private String accountType;
+
+	@Column(name = "ACCOUNT_SOURCE")
+	private String accountSource;
+
+	@Column(name = "ACCOUNT_CREATED_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date accountCreatedDate;
+
+	@Column(name = "ACCOUNT_STATUS")
+	private String accountStatus;
+
+	@Column(name = "CURRENCY_CODE")
+	private String currencyCode;
+
+	@Column(name = "EMAIL_ADDRESS1")
+	private String emailAddress1;
+
+	@Column(name = "EMAIL_ADDRESS2")
+	private String emailAddress2;
+
+	@Column(name = "EMAIL_ADDRESS3")
+	private String emailAddress3;
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
 //    private List<NimaiMLogin> nimaiMLoginList;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
 //    private List<NimaiFCountrygood> nimaiFCountrygoodList;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
-	private List<NimaiFKyc> nimaiFKycList;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "custUserId")
+	private List<NimaiKyc> nimaKycList;
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
 //    private List<NimaiMRefer> nimaiMReferList;
@@ -150,6 +203,286 @@ public class NimaiMCustomer implements Serializable {
 		this.emailAddress = emailAddress;
 		this.mobileNumber = mobileNumber;
 	}
+
+	/**
+	 * @return the rgistredCountry
+	 */
+	public String getRgistredCountry() {
+		return rgistredCountry;
+	}
+
+	/**
+	 * @param rgistredCountry the rgistredCountry to set
+	 */
+	public void setRgistredCountry(String rgistredCountry) {
+		this.rgistredCountry = rgistredCountry;
+	}
+
+	/**
+	 * @return the isRegister
+	 */
+	public int getIsRegister() {
+		return isRegister;
+	}
+
+	/**
+	 * @param isRegister the isRegister to set
+	 */
+	public void setIsRegister(int isRegister) {
+		this.isRegister = isRegister;
+	}
+
+	/**
+	 * @return the isRmassigned
+	 */
+	public int getIsRmassigned() {
+		return isRmassigned;
+	}
+
+	/**
+	 * @param isRmassigned the isRmassigned to set
+	 */
+	public void setIsRmassigned(int isRmassigned) {
+		this.isRmassigned = isRmassigned;
+	}
+
+	/**
+	 * @return the rmId
+	 */
+	public String getRmId() {
+		return rmId;
+	}
+
+	/**
+	 * @param rmId the rmId to set
+	 */
+	public void setRmId(String rmId) {
+		this.rmId = rmId;
+	}
+
+	/**
+	 * @return the isBdetailsfilled
+	 */
+	public int getIsBdetailsfilled() {
+		return isBdetailsfilled;
+	}
+
+	/**
+	 * @param isBdetailsfilled the isBdetailsfilled to set
+	 */
+	public void setIsBdetailsfilled(int isBdetailsfilled) {
+		this.isBdetailsfilled = isBdetailsfilled;
+	}
+
+	/**
+	 * @return the isSplanPurchased
+	 */
+	public int getIsSplanPurchased() {
+		return isSplanPurchased;
+	}
+
+	/**
+	 * @param isSplanPurchased the isSplanPurchased to set
+	 */
+	public void setIsSplanPurchased(int isSplanPurchased) {
+		this.isSplanPurchased = isSplanPurchased;
+	}
+
+	/**
+	 * @return the modeOfPayment
+	 */
+	public String getModeOfPayment() {
+		return modeOfPayment;
+	}
+
+	/**
+	 * @param modeOfPayment the modeOfPayment to set
+	 */
+	public void setModeOfPayment(String modeOfPayment) {
+		this.modeOfPayment = modeOfPayment;
+	}
+
+	/**
+	 * @return the paymentStatus
+	 */
+	public String getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	/**
+	 * @param paymentStatus the paymentStatus to set
+	 */
+	public void setPaymentStatus(String paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+
+	/**
+	 * @return the paymentDate
+	 */
+	public Date getPaymentDate() {
+		return paymentDate;
+	}
+
+	/**
+	 * @param paymentDate the paymentDate to set
+	 */
+	public void setPaymentDate(Date paymentDate) {
+		this.paymentDate = paymentDate;
+	}
+
+	/**
+	 * @return the kycStatus
+	 */
+	public String getKycStatus() {
+		return kycStatus;
+	}
+
+	/**
+	 * @param kycStatus the kycStatus to set
+	 */
+	public void setKycStatus(String kycStatus) {
+		this.kycStatus = kycStatus;
+	}
+
+	/**
+	 * @return the kycApprovedDate
+	 */
+	public Date getKycApprovedDate() {
+		return kycApprovedDate;
+	}
+
+	/**
+	 * @param kycApprovedDate the kycApprovedDate to set
+	 */
+	public void setKycApprovedDate(Date kycApprovedDate) {
+		this.kycApprovedDate = kycApprovedDate;
+	}
+
+	/**
+	 * @return the accountType
+	 */
+	public String getAccountType() {
+		return accountType;
+	}
+
+	/**
+	 * @param accountType the accountType to set
+	 */
+	public void setAccountType(String accountType) {
+		this.accountType = accountType;
+	}
+
+	/**
+	 * @return the accountSource
+	 */
+	public String getAccountSource() {
+		return accountSource;
+	}
+
+	/**
+	 * @param accountSource the accountSource to set
+	 */
+	public void setAccountSource(String accountSource) {
+		this.accountSource = accountSource;
+	}
+
+	/**
+	 * @return the accountCreatedDate
+	 */
+	public Date getAccountCreatedDate() {
+		return accountCreatedDate;
+	}
+
+	/**
+	 * @param accountCreatedDate the accountCreatedDate to set
+	 */
+	public void setAccountCreatedDate(Date accountCreatedDate) {
+		this.accountCreatedDate = accountCreatedDate;
+	}
+
+	/**
+	 * @return the accountStatus
+	 */
+	public String getAccountStatus() {
+		return accountStatus;
+	}
+
+	/**
+	 * @param accountStatus the accountStatus to set
+	 */
+	public void setAccountStatus(String accountStatus) {
+		this.accountStatus = accountStatus;
+	}
+
+	/**
+	 * @return the currencyCode
+	 */
+	public String getCurrencyCode() {
+		return currencyCode;
+	}
+
+	/**
+	 * @param currencyCode the currencyCode to set
+	 */
+	public void setCurrencyCode(String currencyCode) {
+		this.currencyCode = currencyCode;
+	}
+
+	/**
+	 * @return the emailAddress1
+	 */
+	public String getEmailAddress1() {
+		return emailAddress1;
+	}
+
+	/**
+	 * @param emailAddress1 the emailAddress1 to set
+	 */
+	public void setEmailAddress1(String emailAddress1) {
+		this.emailAddress1 = emailAddress1;
+	}
+
+	/**
+	 * @return the emailAddress2
+	 */
+	public String getEmailAddress2() {
+		return emailAddress2;
+	}
+
+	/**
+	 * @param emailAddress2 the emailAddress2 to set
+	 */
+	public void setEmailAddress2(String emailAddress2) {
+		this.emailAddress2 = emailAddress2;
+	}
+
+	/**
+	 * @return the emailAddress3
+	 */
+	public String getEmailAddress3() {
+		return emailAddress3;
+	}
+
+	/**
+	 * @param emailAddress3 the emailAddress3 to set
+	 */
+	public void setEmailAddress3(String emailAddress3) {
+		this.emailAddress3 = emailAddress3;
+	}
+
+//	/**
+//	 * @return the nimaKycList
+//	 */
+//	public List<NimaiKyc> getNimaKycList() {
+//		return nimaKycList;
+//	}
+//
+//	/**
+//	 * @param nimaKycList the nimaKycList to set
+//	 */
+//	public void setNimaKycList(List<NimaiKyc> nimaKycList) {
+//		this.nimaKycList = nimaKycList;
+//	}
 
 	public String getSubscriberType() {
 		return subscriberType;
@@ -349,30 +682,6 @@ public class NimaiMCustomer implements Serializable {
 
 	public void setPincode(String pincode) {
 		this.pincode = pincode;
-	}
-
-	public String getKycStatus() {
-		return kycStatus;
-	}
-
-	public void setKycStatus(String kycStatus) {
-		this.kycStatus = kycStatus;
-	}
-
-	public Date getKycApprovalDate() {
-		return kycApprovalDate;
-	}
-
-	public void setKycApprovalDate(Date kycApprovalDate) {
-		this.kycApprovalDate = kycApprovalDate;
-	}
-
-	public List<NimaiFKyc> getNimaiFKycList() {
-		return nimaiFKycList;
-	}
-
-	public void setNimaiFKycList(List<NimaiFKyc> nimaiFKycList) {
-		this.nimaiFKycList = nimaiFKycList;
 	}
 
 	@Override

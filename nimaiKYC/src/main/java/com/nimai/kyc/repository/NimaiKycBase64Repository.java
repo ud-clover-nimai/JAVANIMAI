@@ -20,9 +20,13 @@ public interface NimaiKycBase64Repository extends JpaRepository<NimaiKyc, Intege
 	List<NimaiKyc> getKycDetailsByUserId(String userid);
 
 	@Modifying
-	@Transactional
+	@Transactional 
 	@Query("update NimaiKyc u set u.country = ?1,u.title = ?2,u.encodedFileContent = ?3,u.custUserId = ?4,u.modifiedDate = ?5,u.kycStatus = ?6 where u.kycId = ?7")
-	void update(String country, String title, String encodedFileContent, Object setCustUserId, Date modifiedDate,
-			String status, Integer kycId);
+	void update(String country, String title, String encodedFileContent, Object setCustUserId,
+			Date modifiedDate,String status,Integer kycId);
 
+
+
+
+	
 }
