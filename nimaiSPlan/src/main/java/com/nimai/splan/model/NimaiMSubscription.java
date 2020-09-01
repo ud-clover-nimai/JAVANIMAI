@@ -4,16 +4,22 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-
 @Entity
-@Table(name="nimai_m_subscription")
+@Table(name = "nimai_m_subscription")
 public class NimaiMSubscription {
+
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "SUBS_PLAN_ID")
+	private int subsPlanId;
+
 	@Column(name = "SUBSCRIPTION_ID")
 	private String subscriptionId;
 
@@ -58,11 +64,70 @@ public class NimaiMSubscription {
 	@Column(name = "CUSTOMER_SUPPORT")
 	private String customerSupport;
 
-	@Column(name="APPROVED_BY")
+	@Column(name = "APPROVED_BY")
 	private String approvedBy;
-	
-	@Column(name="APPROVAL_DATE")
+
+	@Column(name = "APPROVAL_DATE")
 	private Date approvalDate;
+
+	@Column(name = "CUSTOMER_TYPE")
+	private String customerType;
+
+	@Column(name = "COUNTRY_NAME")
+	private String sPLanCountry;
+
+	@Column(name = "CURRENCY")
+	private String currency;
+
+	/**
+	 * @return the subsPlanId
+	 */
+	public int getSubsPlanId() {
+		return subsPlanId;
+	}
+
+	/**
+	 * @param subsPlanId the subsPlanId to set
+	 */
+	public void setSubsPlanId(int subsPlanId) {
+		this.subsPlanId = subsPlanId;
+	}
+
+	/**
+	 * @return the currency
+	 */
+	public String getCurrency() {
+		return currency;
+	}
+
+	/**
+	 * @param currency the currency to set
+	 */
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
+	/**
+	 * @return the sPLanCountry
+	 */
+	public String getsPLanCountry() {
+		return sPLanCountry;
+	}
+
+	/**
+	 * @param sPLanCountry the sPLanCountry to set
+	 */
+	public void setsPLanCountry(String sPLanCountry) {
+		this.sPLanCountry = sPLanCountry;
+	}
+
+	public String getCustomerType() {
+		return customerType;
+	}
+
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
 
 	public String getSubscriptionId() {
 		return subscriptionId;
@@ -191,9 +256,16 @@ public class NimaiMSubscription {
 	public void setApprovalDate(Date approvalDate) {
 		this.approvalDate = approvalDate;
 	}
-	
-	
-	
-	
+
+	@Override
+	public String toString() {
+		return "NimaiMSubscription [subscriptionId=" + subscriptionId + ", subscriptionName=" + subscriptionName
+				+ ", subscriptionAmount=" + subscriptionAmount + ", lCount=" + lCount + ", remark=" + remark
+				+ ", status=" + status + ", subscriptionValidity=" + subscriptionValidity + ", insertedBy=" + insertedBy
+				+ ", modifiedBy=" + modifiedBy + ", insertedDate=" + insertedDate + ", modifiedDate=" + modifiedDate
+				+ ", subsidiaries=" + subsidiaries + ", relationshipManager=" + relationshipManager
+				+ ", customerSupport=" + customerSupport + ", approvedBy=" + approvedBy + ", approvalDate="
+				+ approvalDate + ", customerType=" + customerType + ", sPLanCountry=" + sPLanCountry + "]";
+	}
 
 }
