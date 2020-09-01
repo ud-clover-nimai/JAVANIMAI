@@ -3,104 +3,79 @@ package com.nimai.splan.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nimai.splan.payload.SPlanApprovalBean;
+import com.nimai.splan.payload.GenericResponse;
+import com.nimai.splan.payload.SplanRequest;
 import com.nimai.splan.payload.SubscriptionBean;
 import com.nimai.splan.service.SubscriptionPlanService;
-import com.nimai.splan.service.SubscriptionPlanServiceImpl;
+import com.nimai.splan.utility.ErrorDescription;
 
 @RestController
 public class SubscriptionPlanController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SubscriptionPlanServiceImpl.class);
+	private static Logger logger = LoggerFactory.getLogger(SubscriptionPlanController.class);
 
 	@Autowired
 	private SubscriptionPlanService sPlanService;
-	
+
+	// on the basis of customer type and country splan is view to user
 	@CrossOrigin("*")
-	@PostMapping("/saveTempSplan")
-	public ResponseEntity<?> saveSubscriptionDetails(@RequestBody SubscriptionBean subscriptionRequest) {
-			LOGGER.info(" ================ Subscription Plan Controller -> saveSubscriptionDetails ================");
+	@PostMapping("/viewCustomerSPlan")
+	public ResponseEntity<?> ViewCustomerSPlans(@RequestBody SplanRequest sPLanRequest) {
+		logger.info(" ================ Send ViewCustomerSPlans API is Invoked ================:"
+				+ sPLanRequest.getUserId());
+		GenericResponse response = new GenericResponse<>();
+		if (!sPLanRequest.getUserId().substring(0, 2).equalsIgnoreCase("RE")) {
+			return sPlanService.findCustomerSPlanDetails(sPLanRequest);
+		}
+		response.setErrCode("ASA014");
+		response.setErrMessage(ErrorDescription.getDescription("ASA014"));
+		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
 
-		return sPlanService.saveOrUpdateSubscriptionPlanDetails(subscriptionRequest);
-
-	}
-
-	@CrossOrigin("*")
-	@GetMapping("/viewTempSplan")
-	public ResponseEntity<?> findAllSubscriptionPlanDetails() {
-		LOGGER.info(
-				" ================ Subscription Plan Controller -> findAllSubscriptionPlanDetails ================");
-
-		return sPlanService.findAllSPlanDetails();
-	}
-
-	@CrossOrigin(value = "*", allowedHeaders = "*")
-	@RequestMapping(value = "/confirmSplanDetails", produces = "application/json", method = RequestMethod.POST)
-	public ResponseEntity<?> confirmSplanDetails(@RequestBody SPlanApprovalBean sPlanEntity) {
-		LOGGER.info(" ================ Subscription Plan Controller -> confirmSplanDetails ================");
-
-		return sPlanService.saveSplanDetails(sPlanEntity);
-	}
-
-	@CrossOrigin("*")
-	@GetMapping("/viewSPlanToUser/{userId}")
-	public ResponseEntity<?> viewSPlanToUser(@PathVariable("userId") String userId) {
-		LOGGER.info(" ================ Subscription Plan Controller -> viewSPlanToUser ================");
-		return sPlanService.findMSPlanDetails(userId);
-	}
-	
-	@CrossOrigin("*")
-	@GetMapping("/getSPlans")
-	public ResponseEntity<?> getAllSPlanDetails() {
-		LOGGER.info(" ================ Subscription Plan Controller -> getAllSPlanDetails ================");
-
-		return sPlanService.getAllMasterSPlanDetails();
 	}
 
 	@CrossOrigin("*")
 	@PostMapping("/saveUserSubscriptionPlan/{userId}")
-	public ResponseEntity<?> saveUserSubscriptionPlan(@PathVariable("userId") String userID,
+	public ResponseEntity<?> saveCustomerSPlan(@PathVariable("userId") String userID,
 			@RequestBody SubscriptionBean subscriptionRequest) {
-		LOGGER.info(" ================ Subscription Plan Controller -> saveUserSubscriptionPlan ================");
+		logger.info(" ================ Send saveCustomerSPlan API is Invoked ================:" + userID);
+		GenericResponse response = new GenericResponse<>();
+		if (!userID.substring(0, 2).equalsIgnoreCase("RE")) {
+			return sPlanService.saveUserSubscriptionPlan(subscriptionRequest, userID);
+		}
+		response.setErrCode("ASA014");
+		response.setErrMessage(ErrorDescription.getDescription("ASA014"));
+		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
 
-		return sPlanService.saveUserSubscriptionPlan(subscriptionRequest, userID);
 	}
+
+	@CrossOrigin("*")
+	@GetMapping("/viewSPlanToUser/{userId}")
+	public ResponseEntity<?> viewSPlanToCustomer(@PathVariable("userId") String userId) {
+		logger.info(" ================ Send viewSPlanToCustomer API is Invoked ================:" + userId);
+		return sPlanService.findMSPlanDetails(userId);
+	}
+
 	@CrossOrigin("*")
 	@GetMapping("/list/{userId}")
 	public ResponseEntity<?> findAllSPlanDetailsByUserId(@PathVariable("userId") String userId) {
-		LOGGER.info(" ================ Subscription Plan Controller -> findAllSPlanDetailsByUserId ================");
-
+		logger.info(" ================ Send findAllSPlanDetailsByUserId API is Invoked ================:" + userId);
 		return sPlanService.findSPlanDetailsByUserId(userId);
-	}
-
-	@CrossOrigin("*")
-	@DeleteMapping("/subscriptionPlan/{subscriptionId}")
-	public ResponseEntity<?> deleteSPlan(@PathVariable("subscriptionId") String subscriptionId) {
-		LOGGER.info(" ================ Subscription Plan Controller -> deleteSPlan ================");
-
-		return sPlanService.deleteBySubscriptionId(subscriptionId);
 	}
 
 	@CrossOrigin("*")
 	@GetMapping("/getSPlan/{userId}")
 	public ResponseEntity<?> getSPlanByUserId(@PathVariable("userId") String userId) {
-		LOGGER.info(" ================ Subscription Plan Controller -> getSPlanByUserId ================");
-
+		logger.info(" ================ Send getSPlanByUserId API is Invoked ================:" + userId);
 		return sPlanService.getSPlanByUserId(userId);
 	}
-	
-	
 
-	
 }

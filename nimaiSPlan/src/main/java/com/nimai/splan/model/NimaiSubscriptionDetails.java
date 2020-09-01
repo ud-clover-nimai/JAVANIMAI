@@ -77,6 +77,139 @@ public class NimaiSubscriptionDetails implements Serializable {
 	@ManyToOne(optional = false)
 	private NimaiMCustomer userid;
 
+	@Column(name = "CUSTOMER_TYPE")
+	private String customerType;
+
+	@Column(name = "COUNTRY_NAME")
+	private String sPLanCountry;
+
+	@Column(name = "LC_UTILIZED_COUNT")
+	private int lcUtilizedCount;
+
+	@Column(name = "SUBSIDIARIES_UTILIZED_COUNT")
+	private int subsidiaryUtilizedCount;
+
+	@Column(name = "IS_VAS_APPLIED")
+	private int isVasApplied;
+
+	@Column(name = "VAS_AMOUNT")
+	private int vasAmount;
+
+	@Column(name = "GRAND_AMOUNT")
+	private int grandAmount;
+
+	@Column(name = "KYC_COUNT")
+	private int kycCount;
+	
+	
+	
+
+	/**
+	 * @return the lcUtilizedCount
+	 */
+	public int getLcUtilizedCount() {
+		return lcUtilizedCount;
+	}
+
+	/**
+	 * @param lcUtilizedCount the lcUtilizedCount to set
+	 */
+	public void setLcUtilizedCount(int lcUtilizedCount) {
+		this.lcUtilizedCount = lcUtilizedCount;
+	}
+
+	/**
+	 * @return the subsidiaryUtilizedCount
+	 */
+	public int getSubsidiaryUtilizedCount() {
+		return subsidiaryUtilizedCount;
+	}
+
+	/**
+	 * @param subsidiaryUtilizedCount the subsidiaryUtilizedCount to set
+	 */
+	public void setSubsidiaryUtilizedCount(int subsidiaryUtilizedCount) {
+		this.subsidiaryUtilizedCount = subsidiaryUtilizedCount;
+	}
+
+	/**
+	 * @return the isVasApplied
+	 */
+	public int getIsVasApplied() {
+		return isVasApplied;
+	}
+
+	/**
+	 * @param isVasApplied the isVasApplied to set
+	 */
+	public void setIsVasApplied(int isVasApplied) {
+		this.isVasApplied = isVasApplied;
+	}
+
+	/**
+	 * @return the vasAmount
+	 */
+	public int getVasAmount() {
+		return vasAmount;
+	}
+
+	/**
+	 * @param vasAmount the vasAmount to set
+	 */
+	public void setVasAmount(int vasAmount) {
+		this.vasAmount = vasAmount;
+	}
+
+	/**
+	 * @return the grandAmount
+	 */
+	public int getGrandAmount() {
+		return grandAmount;
+	}
+
+	/**
+	 * @param grandAmount the grandAmount to set
+	 */
+	public void setGrandAmount(int grandAmount) {
+		this.grandAmount = grandAmount;
+	}
+
+	/**
+	 * @return the kycCount
+	 */
+	public int getKycCount() {
+		return kycCount;
+	}
+
+	/**
+	 * @param kycCount the kycCount to set
+	 */
+	public void setKycCount(int kycCount) {
+		this.kycCount = kycCount;
+	}
+
+	/**
+	 * @return the sPLanCountry
+	 */
+	public String getsPLanCountry() {
+		return sPLanCountry;
+	}
+
+	/**
+	 * @param sPLanCountry the sPLanCountry to set
+	 */
+	public void setsPLanCountry(String sPLanCountry) {
+		this.sPLanCountry = sPLanCountry;
+	}
+
+	public String getCustomerType() {
+		return customerType;
+	}
+
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
+
 	public int getSubscriptionValidity() {
 		return subscriptionValidity;
 	}
@@ -188,8 +321,6 @@ public class NimaiSubscriptionDetails implements Serializable {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
-
 
 	public String getInsertedBy() {
 		return insertedBy;

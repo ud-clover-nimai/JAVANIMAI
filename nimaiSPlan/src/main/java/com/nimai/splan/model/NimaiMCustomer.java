@@ -215,6 +215,11 @@ public class NimaiMCustomer implements Serializable {
 
 //	@OneToOne(cascade = CascadeType.ALL, mappedBy = "userid")
 //	private NimaiMSubscription nimaiMSubscription;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
+	private List<NimaiSubscriptionDetails> subscriptionDetails;
+    
+
 
 	public Boolean getIsSPlanPurchased() {
 		return isSPlanPurchased;
@@ -248,8 +253,7 @@ public class NimaiMCustomer implements Serializable {
 		this.paymentDate = paymentDate;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
-	private List<NimaiSubscriptionDetails> subscriptionDetails;
+	
 
 	public NimaiMCustomer() {
 	}
