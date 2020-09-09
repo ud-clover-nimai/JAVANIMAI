@@ -30,7 +30,7 @@ public class PersonalDetailsBean implements Serializable {
 	private Date kycApprovalDate;
 	private Boolean isRmAssigned;
 	private String rmId;
-	
+
 	private String emailAddress1;
 	private String emailAddress2;
 	private String emailAddress3;
@@ -50,8 +50,7 @@ public class PersonalDetailsBean implements Serializable {
 	private String account_status;
 	private Date account_created_date;
 	private String regCurrency;
-	
-	
+
 	public String getUserId() {
 		return userId;
 	}
@@ -252,7 +251,6 @@ public class PersonalDetailsBean implements Serializable {
 		this.rmId = rmId;
 	}
 
-	
 	public String getAccount_type() {
 		return account_type;
 	}
@@ -334,6 +332,4 @@ public class PersonalDetailsBean implements Serializable {
 				+ account_created_date + ", regCurrency=" + regCurrency + "]";
 	}
 
-	
-	
 }
