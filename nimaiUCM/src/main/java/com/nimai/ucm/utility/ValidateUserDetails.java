@@ -22,11 +22,11 @@ public class ValidateUserDetails {
 
 	public String validatePersonalDetails(PersonalDetailsBean personDetailsBean) {
 
-		final Pattern COUNTRY_NAME = Pattern.compile("^[a-zA-Z]*$");
+//		final Pattern COUNTRY_NAME = Pattern.compile("^[a-zA-Z '`.()-]*$");
 		//final Pattern EMAIADDRESS = Pattern.compile("^(.+)@(.+)$");
 		final Pattern FIRSTNAME = Pattern.compile("^([a-zA-Z '-]+)$");
 		final Pattern LASTNAME = Pattern.compile("^([a-zA-Z '-]+)$");
-		final Pattern MOBILENUM = Pattern.compile("^[0-9]*$");
+//		final Pattern MOBILENUM = Pattern.compile("^[0-9-]*$");
 		final Pattern SUBSCRIBERTYPE = Pattern.compile("^[a-zA-Z]*$");
 		// final Pattern LANDLINENUMBER = Pattern.compile("^[0-9]*$");
 		
@@ -103,32 +103,32 @@ public class ValidateUserDetails {
 					}
 				}
 				
-				if (!(personDetailsBean.getMobileNum() == null) || (personDetailsBean.getMobileNum().trim().isEmpty())) {
-					if (!MOBILENUM.matcher(personDetailsBean.getMobileNum()).matches()) {
-						return "Mobile number should be digits only";
-					}
-					if ((personDetailsBean.getMobileNum().length() < 7)) {
-						return "Mobile number should be greater than 7 digits";
-					}
-				}
-				if (!((personDetailsBean.getLandLinenumber() == null) || (personDetailsBean.getLandLinenumber().trim().isEmpty()))) {
-					if (!MOBILENUM.matcher(personDetailsBean.getLandLinenumber()).matches()) {
-						return "Landline Number should be digits only";
-					}
-					if ((personDetailsBean.getLandLinenumber().length() < 7)) {
-						return "Landline Number must be greater than 7 digits";
-					}
-				}
+//				if (!(personDetailsBean.getMobileNum() == null) || (personDetailsBean.getMobileNum().trim().isEmpty())) {
+//					if (!MOBILENUM.matcher(personDetailsBean.getMobileNum()).matches()) {
+//						return "Mobile number should be digits only";
+//					}
+//					if ((personDetailsBean.getMobileNum().length() < 7)) {
+//						return "Mobile number should be greater than 7 digits";
+//					}
+//				}
+//				if (!((personDetailsBean.getLandLinenumber() == null) || (personDetailsBean.getLandLinenumber().trim().isEmpty()))) {
+//					if (!MOBILENUM.matcher(personDetailsBean.getLandLinenumber()).matches()) {
+//						return "Landline Number should be digits only";
+//					}
+//					if ((personDetailsBean.getLandLinenumber().length() < 7)) {
+//						return "Landline Number must be greater than 7 digits";
+//					}
+//				}
 				if ((personDetailsBean.getCountryName() == null)
 						|| (personDetailsBean.getCountryName().trim().isEmpty())) {
 					return "Please enter country name";
 				}
-				if (!COUNTRY_NAME.matcher(personDetailsBean.getCountryName()).matches()) {
-					return "Country name always only characters";
-				}
-				if ((personDetailsBean.getCountryName().length() <= 2) || (personDetailsBean.getCountryName().length() > 25)) {
-					return "Country Name should be greater then 3 characters and less then 25 characters";
-				}
+//				if (!COUNTRY_NAME.matcher(personDetailsBean.getCountryName()).matches()) {
+//					return "Country name always only characters";
+//				}
+//				if ((personDetailsBean.getCountryName().length() <= 2) || (personDetailsBean.getCountryName().length() > 25)) {
+//					return "Country Name should be greater then 3 characters and less then 25 characters";
+//				}
 				if ((personDetailsBean.getSubscriberType().equalsIgnoreCase("REFERRER"))
 						&& ((personDetailsBean.getCompanyName() == null)
 								|| (personDetailsBean.getCompanyName().trim().isEmpty()))) {
@@ -175,8 +175,8 @@ public class ValidateUserDetails {
 
 		boolean isUserIdExist = registerUser.checkUserId(businessDetailsBean.getUserId());
 
-		final Pattern COMPANYNAME = Pattern.compile("^[a-zA-Z@.]*$");
-		final Pattern COUNTRY = Pattern.compile("^[a-zA-Z]*$");
+		final Pattern COMPANYNAME = Pattern.compile("^[a-zA-Z@.]*$"); 
+//		final Pattern COUNTRY =Pattern.compile("^[a-zA-Z '`-]*$");
 		final Pattern DESIGNATION = Pattern.compile("^[a-zA-Z]*$");
 		final Pattern OFFCADDRESS = Pattern.compile("\"([^\\\\\"]|\\\\\")*\"");
 		final Pattern OFFCNUMBER = Pattern.compile("^[0-9]*$");
@@ -271,9 +271,9 @@ public class ValidateUserDetails {
 				return "Please enter the telephone number";
 			}
 		
-			if ((businessDetailsBean.getRegisteredCountry()) == null || (businessDetailsBean.getRegisteredCountry().trim().isEmpty())) {
-				return "Please select company's registered country name";
-			}
+//			if ((businessDetailsBean.getRegisteredCountry()) == null || (businessDetailsBean.getRegisteredCountry().trim().isEmpty())) {
+//				return "Please select company's registered country name";
+//			}
 			if ((businessDetailsBean.getAddress1()) == null || (businessDetailsBean.getAddress1().trim().isEmpty())) {
 				return "Please enter Address1 field";
 			}
