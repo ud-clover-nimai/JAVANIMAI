@@ -430,7 +430,8 @@ public class RegisterServiceImpl implements RegisterUserService {
 		pdb.setSubscriberType(nc.getSubscriberType());
 
 		if (nc.getSubscriberType().equalsIgnoreCase("BANK") && nc.getBankType().equalsIgnoreCase("Underwriter")) {
-
+			
+			blgr.deleteBlackListedGoodsUserId(nc.getUserid());
 			for (BlackListedGoodsBean blgBean : pdb.getBlacklistedGoods()) {
 				if (blgBean.getGoods_ID() == null) {
 
@@ -443,7 +444,8 @@ public class RegisterServiceImpl implements RegisterUserService {
 				}
 
 			}
-
+			
+			icr.deleteInterestedCountryUserId(nc.getUserid());
 			for (InterestedCountryBean intCon : pdb.getInterestedCountry()) {
 				if (intCon.getCountryID() == null) {
 					InterestedCountry ic = new InterestedCountry();
