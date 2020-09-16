@@ -26,21 +26,27 @@ public class SubscriptionPlanController {
 	@Autowired
 	private SubscriptionPlanService sPlanService;
 
-	// on the basis of customer type and country splan is view to user
-	@CrossOrigin("*")
-	@PostMapping("/viewCustomerSPlan")
-	public ResponseEntity<?> ViewCustomerSPlans(@RequestBody SplanRequest sPLanRequest) {
-		logger.info(" ================ Send ViewCustomerSPlans API is Invoked ================:"
-				+ sPLanRequest.getUserId());
-		GenericResponse response = new GenericResponse<>();
-		if (!sPLanRequest.getUserId().substring(0, 2).equalsIgnoreCase("RE")) {
-			return sPlanService.findCustomerSPlanDetails(sPLanRequest);
-		}
-		response.setErrCode("ASA014");
-		response.setErrMessage(ErrorDescription.getDescription("ASA014"));
-		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
-
-	}
+	/**
+	 * Dhiraj Code
+	 *  on the basis of customer type and country splan is view to user
+	 * @param userID
+	 * @param subscriptionRequest
+	 * @return
+	 */
+//	@CrossOrigin("*")
+//	@PostMapping("/viewCustomerSPlan")
+//	public ResponseEntity<?> ViewCustomerSPlans(@RequestBody SplanRequest sPLanRequest) {
+//		logger.info(" ================ Send ViewCustomerSPlans API is Invoked ================:"
+//				+ sPLanRequest.getUserId());
+//		GenericResponse response = new GenericResponse<>();
+//		if (!sPLanRequest.getUserId().substring(0, 2).equalsIgnoreCase("RE")) {
+//			return sPlanService.findCustomerSPlanDetails(sPLanRequest);
+//		}
+//		response.setErrCode("ASA014");
+//		response.setErrMessage(ErrorDescription.getDescription("ASA014"));
+//		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+//
+//	}
 
 	@CrossOrigin("*")
 	@PostMapping("/saveUserSubscriptionPlan/{userId}")
@@ -77,5 +83,21 @@ public class SubscriptionPlanController {
 		logger.info(" ================ Send getSPlanByUserId API is Invoked ================:" + userId);
 		return sPlanService.getSPlanByUserId(userId);
 	}
+	
+	@CrossOrigin("*")
+	@PostMapping("/viewCustomerSPlan")
+	public ResponseEntity<?> ViewCustomerSPlans(@RequestBody SplanRequest sPLanRequest) {
+		logger.info(" ================ Send ViewCustomerSPlans API is Invoked ================:"
+				+ sPLanRequest.getUserId());
+		GenericResponse response = new GenericResponse<>();
+		if (!sPLanRequest.getUserId().substring(0, 2).equalsIgnoreCase("RE")) {
+			return sPlanService.findCustomerSPlanDetails(sPLanRequest);
+		}
+		response.setErrCode("ASA014");
+		response.setErrMessage(ErrorDescription.getDescription("ASA014"));
+		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+
+	}
+
 
 }
