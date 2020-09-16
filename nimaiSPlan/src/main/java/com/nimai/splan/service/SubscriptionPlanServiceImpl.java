@@ -66,6 +66,14 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
 			if (subscriptionRequest.getSubscriptionId() != null) {
 				Optional<NimaiMCustomer> mCustomer = userRepository.findByUserId(userId);
 				if (mCustomer.isPresent()) {
+					List<NimaiSubscriptionDetails> subscriptionEntity = subscriptionDetailsRepository
+							.findAllByUserId(userId);
+					if (!subscriptionEntity.isEmpty()) {
+						for (NimaiSubscriptionDetails plan : subscriptionEntity) {
+							plan.setStatus("Inactive");
+							subscriptionDetailsRepository.save(plan);
+						}
+					}
 					NimaiSubscriptionDetails subScriptionDetails = new NimaiSubscriptionDetails();
 					subScriptionDetails.setSubscriptionName(subscriptionRequest.getSubscriptionName());
 					subScriptionDetails.setUserid(mCustomer.get());
@@ -90,7 +98,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
 					int month = endDate.getNoOfMonths(subScriptionDetails.getSubscriptionValidity());
 					System.out.println(year);
 					System.out.println(month);
-					subScriptionDetails.setStatus("INACTIVE");
+					subScriptionDetails.setStatus("ACTIVE");
 					Calendar cal = Calendar.getInstance();
 					Date today = cal.getTime();
 					cal.add(Calendar.YEAR, year);
@@ -281,65 +289,65 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
 		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
 	}
 
-	@Override
-	public ResponseEntity<?> findCustomerSPlanDetails(SplanRequest sPlanRequest) {
-		GenericResponse response = new GenericResponse<>();
-		logger.info("======findCustomerSPlanDetails method invoked===========");
-		try {
-			Optional<NimaiMCustomer> user = userRepository.findById(sPlanRequest.getUserId());
-			SPlanResponseBean sPlanResponseBean = new SPlanResponseBean();
-
-			if (user.isPresent()) {
-				List<NimaiSubscriptionDetails> sPlanEntity = subscriptionDetailsRepository.findAllByUserId(sPlanRequest.getUserId());
-
-				if (!sPlanEntity.isEmpty()) {
-					for (NimaiSubscriptionDetails temp : sPlanEntity) {
-						if (temp.getStatus().equalsIgnoreCase("Active")
-								|| temp.getStatus().equalsIgnoreCase("Pending")) {
-
-							SubscriptionPlanResponse detailResponse = ModelMapper.mapEntityToEntityResponse(temp);
-							response.setData(detailResponse);
-							return new ResponseEntity<>(response, HttpStatus.OK);
-						} else {
-							sPlanResponseBean = sPlanMasterlist(user.get());
-							if (sPlanResponseBean != null) {
-								response.setData(sPlanResponseBean);
-								return new ResponseEntity<>(response, HttpStatus.OK);
-							} else {
-								response.setErrCode("ASA012");
-								response.setErrMessage(ErrorDescription.getDescription("ASA012"));
-								return new ResponseEntity<>(response, HttpStatus.OK);
-							}
-						}
-
-					}
-				} else {
-					sPlanResponseBean = sPlanMasterlist(user.get());
-					if (sPlanResponseBean != null) {
-						response.setData(sPlanResponseBean);
-						return new ResponseEntity<>(response, HttpStatus.OK);
-					} else {
-						response.setErrCode("ASA012");
-						response.setErrMessage(ErrorDescription.getDescription("ASA012"));
-						return new ResponseEntity<>(response, HttpStatus.OK);
-					}
-
-				}
-			} else {
-				response.setErrCode("ASA003");
-				response.setErrMessage(ErrorDescription.getDescription("ASA003"));
-				return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
-			}
-
-		}
-
-		catch (Exception e) {
-			response.setErrMessage("No entity Found");
-			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
-		}
-		response.setErrMessage("No response");
-		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
-	}
+//	@Override
+//	public ResponseEntity<?> findCustomerSPlanDetails(SplanRequest sPlanRequest) {
+//		GenericResponse response = new GenericResponse<>();
+//		logger.info("======findCustomerSPlanDetails method invoked===========");
+//		try {
+//			Optional<NimaiMCustomer> user = userRepository.findById(sPlanRequest.getUserId());
+//			SPlanResponseBean sPlanResponseBean = new SPlanResponseBean();
+//
+//			if (user.isPresent()) {
+//				List<NimaiSubscriptionDetails> sPlanEntity = subscriptionDetailsRepository.findAllByUserId(sPlanRequest.getUserId());
+//
+//				if (!sPlanEntity.isEmpty()) {
+//					for (NimaiSubscriptionDetails temp : sPlanEntity) {
+//						if (temp.getStatus().equalsIgnoreCase("Active")
+//								|| temp.getStatus().equalsIgnoreCase("Pending")) {
+//
+//							SubscriptionPlanResponse detailResponse = ModelMapper.mapEntityToEntityResponse(temp);
+//							response.setData(detailResponse);
+//							return new ResponseEntity<>(response, HttpStatus.OK);
+//						} else {
+//							sPlanResponseBean = sPlanMasterlist(user.get());
+//							if (sPlanResponseBean != null) {
+//								response.setData(sPlanResponseBean);
+//								return new ResponseEntity<>(response, HttpStatus.OK);
+//							} else {
+//								response.setErrCode("ASA012");
+//								response.setErrMessage(ErrorDescription.getDescription("ASA012"));
+//								return new ResponseEntity<>(response, HttpStatus.OK);
+//							}
+//						}
+//
+//					}
+//				} else {
+//					sPlanResponseBean = sPlanMasterlist(user.get());
+//					if (sPlanResponseBean != null) {
+//						response.setData(sPlanResponseBean);
+//						return new ResponseEntity<>(response, HttpStatus.OK);
+//					} else {
+//						response.setErrCode("ASA012");
+//						response.setErrMessage(ErrorDescription.getDescription("ASA012"));
+//						return new ResponseEntity<>(response, HttpStatus.OK);
+//					}
+//
+//				}
+//			} else {
+//				response.setErrCode("ASA003");
+//				response.setErrMessage(ErrorDescription.getDescription("ASA003"));
+//				return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+//			}
+//
+//		}
+//
+//		catch (Exception e) {
+//			response.setErrMessage("No entity Found");
+//			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+//		}
+//		response.setErrMessage("No response");
+//		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+//	}
 
 	public SPlanResponseBean sPlanMasterlist(NimaiMCustomer user) {
 		logger.info("======SPlanResponseBean method invoked===========");
@@ -376,6 +384,61 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
 			}
 		}
 
+	}
+
+	@Override
+	public ResponseEntity<?> findCustomerSPlanDetails(SplanRequest sPlanRequest) {
+		GenericResponse response = new GenericResponse<>();
+		logger.info("======findCustomerSPlanDetails method invoked===========");
+		try {
+			Optional<NimaiMCustomer> user = userRepository.findById(sPlanRequest.getUserId());
+			SPlanResponseBean sPlanResponseBean = new SPlanResponseBean();
+
+			if (user.isPresent()) {
+				String customerType = user.get().getUserid().substring(0, 2);
+				logger.info("CountryName:" + user.get().getRegistredCountry());
+				if (customerType.equalsIgnoreCase("CU")) {
+					List<NimaiMSubscription> custSPlanList = masterSPlanRepo.findByCountry("Customer",
+							user.get().getRegistredCountry());
+					System.out.println(custSPlanList.toString());
+					if (!custSPlanList.isEmpty()) {
+						List<customerSPlansResponse> custSubscriptionBean = ModelMapper
+								.mapCustSplanListToSBeanRsponse(custSPlanList);
+						sPlanResponseBean.setCustomerSplans(custSubscriptionBean);
+					} else {
+						sPlanResponseBean = null;
+					}
+				} else {
+					List<NimaiMSubscription> banksSPlanList = masterSPlanRepo.findByCountry("Bank",
+							user.get().getRegistredCountry());
+					if (!banksSPlanList.isEmpty()) {
+						List<banksSplansReponse> banksubscriptionBean = ModelMapper
+								.mapBankSplanListToSBeanRsponse(banksSPlanList);
+						sPlanResponseBean.setBanksSplans(banksubscriptionBean);
+					} else {
+						sPlanResponseBean = null;
+					}
+				}
+
+				if (sPlanResponseBean != null) {
+					response.setData(sPlanResponseBean);
+					return new ResponseEntity<>(response, HttpStatus.OK);
+				} else {
+					response.setErrCode("ASA012");
+					response.setErrMessage(ErrorDescription.getDescription("ASA012"));
+					return new ResponseEntity<>(response, HttpStatus.OK);
+				}
+
+			} else {
+				response.setErrCode("ASA003");
+				response.setErrMessage(ErrorDescription.getDescription("ASA003"));
+				return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+			}
+
+		} catch (Exception e) {
+			response.setErrMessage("No entity Found");
+			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+		}
 	}
 
 }
