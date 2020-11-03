@@ -88,6 +88,16 @@ public class NimaiMLogin implements Serializable {
 
 	
 	
+
+
+
+	/**
+	 * @return the password
+	 */
+	public String getPassword() {
+		return password;
+	}
+
 	public NimaiMLogin() {
 	}
 

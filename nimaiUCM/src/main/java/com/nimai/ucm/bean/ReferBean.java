@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class ReferBean {
 
+	private int id;
 	private String userId;
 	private String referenceId;
 	private String firstName;
@@ -18,6 +19,25 @@ public class ReferBean {
 	private String branchUserId;
 	private String insertedBy;
 	private String modifiedBy;
+
+	
+	
+	
+
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public String getUserId() {
 		return userId;
