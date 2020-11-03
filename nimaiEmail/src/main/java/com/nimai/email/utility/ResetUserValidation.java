@@ -2,11 +2,13 @@ package com.nimai.email.utility;
 
 import java.util.regex.Pattern;
 
+import org.hibernate.query.criteria.internal.predicate.IsEmptyPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.nimai.email.bean.UserRegistrationBean;
 import com.nimai.email.bean.AlertToBanksBean;
 import com.nimai.email.bean.BranchUserPassCodeBean;
 import com.nimai.email.bean.BranchUserRequest;
@@ -14,11 +16,13 @@ import com.nimai.email.bean.KycEmailRequest;
 import com.nimai.email.bean.LcUploadBean;
 import com.nimai.email.bean.QuotationAlertRequest;
 import com.nimai.email.bean.SubsidiaryBean;
-import com.nimai.email.bean.UserRegistrationBean;
 import com.nimai.email.dao.EmailConfigurationdaoImpl;
 import com.nimai.email.dao.UserServiceDao;
 import com.nimai.email.entity.EmailComponentMaster;
 import com.nimai.email.entity.NimaiClient;
+import com.nimai.email.entity.NimaiEmailScheduler;
+import com.nimai.email.entity.NimaiEmailSchedulerAlertToBanks;
+import com.nimai.email.service.UserServiceImpl;
 
 @Component
 public class ResetUserValidation {
@@ -185,6 +189,8 @@ public class ResetUserValidation {
 					|| alertBanksBean.getEvent().equalsIgnoreCase("LC_UPDATE_ALERT_ToBanks")
 					|| alertBanksBean.getEvent().equalsIgnoreCase("LC_Reopening_ALERT_ToBanks")
 					|| alertBanksBean.getEvent().equalsIgnoreCase("QUOTE_ACCEPT")
+					||alertBanksBean.getEvent().equalsIgnoreCase("BId_ALERT_ToCustomer")
+					||alertBanksBean.getEvent().equalsIgnoreCase("Bank_Details_tocustomer")
 					|| alertBanksBean.getEvent().equalsIgnoreCase("QUOTE_REJECTION"))
 					|| alertBanksBean.getEvent().equalsIgnoreCase("QUOTE_ACCEPT_ALERT_ToBanks"))) {
 				return "Invalid Event";
@@ -342,6 +348,153 @@ public class ResetUserValidation {
 			if ((passCodeBean.getToken().trim().isEmpty()) || (passCodeBean.getToken() == null)) {
 				return "Token should not be null";
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Failed : " + e.getMessage();
+		}
+		return "success";
+
+	}
+
+	public String Validation(NimaiEmailScheduler schdulerData) {
+		logger.info(" ================ Validation utility invoked for scheduler method================" + schdulerData.toString());
+		EmailComponentMaster emailconfigurationBean = new EmailComponentMaster();
+		final Pattern EMAILPATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
+		emailconfigurationBean = emailConfigurationDAOImpl.findEventConfiguration(schdulerData.getEvent());   
+		logger.info(" ================ Send resetPaasword Link API is  Invoked ================"
+				+ emailconfigurationBean.getEmailEventMaster().getEmailEventName());
+
+		try {
+
+			if (!EMAILPATTERN.matcher(schdulerData.getEmailId()).matches()) {
+				return "Email id invalid";
+			}
+			if (!schdulerData.getEvent().trim().isEmpty()) {
+				emailconfigurationBean = emailConfigurationDAOImpl.findEventConfiguration(schdulerData.getEvent());
+				if (emailconfigurationBean == null) {
+					return "Email Event not Exists";
+				}
+
+			} else {
+				return "Email Event should not be empty.";
+			}
+
+			if (!EMAILPATTERN.matcher(schdulerData.getEmailId()).matches()) {
+				return "Email id invalid";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Failed : " + e.getMessage();
+		}
+		return "success";
+
+	}
+
+	public String subsidiaryValidation(NimaiEmailScheduler schdulerData) {
+		logger.info(" ================scheduler subsidiaryValidation utility invoked================" + schdulerData.toString());
+		EmailComponentMaster emailconfigurationBean = null;
+		final Pattern EMAILPATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
+
+		try {
+			if (!schdulerData.getUserid().trim().isEmpty()) {
+				boolean isUserIdExisist = userDao.isUserIdExisist(schdulerData.getUserid());
+
+				if (isUserIdExisist != true) {
+					return "Invalid userId";
+				}
+			} else {
+				return "User Id should not be empty";
+			}
+
+			if (!schdulerData.getEvent().trim().isEmpty()) {
+				emailconfigurationBean = emailConfigurationDAOImpl.findEventConfiguration(schdulerData.getEvent());
+				if (emailconfigurationBean == null) {
+					return "Email Event not Exists";
+				}
+
+			} else {
+				return "Email Event should not be empty.";
+			}
+
+			if (!EMAILPATTERN.matcher(schdulerData.getEmailId()).matches()) {
+				return "Email id invalid";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Failed : " + e.getMessage();
+		}
+		return "success";
+
+	}
+
+	public String branchUserValidation(NimaiEmailScheduler schdulerData) {
+		logger.info("==========branchUserValidation==========" + schdulerData.toString());
+		EmailComponentMaster emailconfigurationBean = null;
+		final Pattern EMAILPATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
+
+		try {
+		
+			if (schdulerData.getUserid().trim().isEmpty() && schdulerData.getUserid() == null) {
+				return "User Id should not be empty";
+			}
+
+			if (!schdulerData.getEvent().trim().isEmpty()) {
+				emailconfigurationBean = emailConfigurationDAOImpl.findEventConfiguration(schdulerData.getEvent());
+				if (emailconfigurationBean == null) {
+					return "Email Event not Exists";
+				}
+
+			} else {
+				return "Email Event should not be empty.";
+			}
+
+			if (!EMAILPATTERN.matcher(schdulerData.getEmailId()).matches()) {
+				return "Email id invalid";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Failed : " + e.getMessage();
+		}
+		return "success";
+
+	}
+
+	public String bankEmailValidation(NimaiEmailSchedulerAlertToBanks schdulerData, String banksEmailID) {
+		logger.info(
+				" ================ banksEmailValidation utility invoked================" + schdulerData.toString(),
+				banksEmailID);
+		EmailComponentMaster emailconfigurationBean = null;
+		final Pattern EMAILPATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
+
+		try {
+
+			if (!((schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPLOAD_ALERT_ToBanks")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("LC_REJECT_ALERT_ToBanks")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPLOAD(DATA)")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPDATE(DATA)")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPDATE_ALERT_ToBanks")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("LC_Reopening_ALERT_ToBanks")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("QUOTE_ACCEPT")
+					||schdulerData.getEmailEvent().equalsIgnoreCase("BId_ALERT_ToCustomer")
+					||schdulerData.getEmailEvent().equalsIgnoreCase("Bank_Details_tocustomer")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("QUOTE_REJECTION"))
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("QUOTE_PLACE_ALERT_ToBanks"))) {
+				return "Invalid Event";
+			}
+
+			if (!schdulerData.getEmailEvent().trim().isEmpty()) {
+				emailconfigurationBean = emailConfigurationDAOImpl.findEventConfiguration(schdulerData.getEmailEvent());
+				if (emailconfigurationBean == null) {
+					return "Email Event not Exists";
+				}
+
+			} else {
+				return "Email Event should not be empty.";
+			}
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "Failed : " + e.getMessage();

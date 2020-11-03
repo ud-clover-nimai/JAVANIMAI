@@ -38,104 +38,151 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 		@StoredProcedureParameter(mode = ParameterMode.IN, name = "inp_transaction_ID", type = String.class)})
 public class NimaiClient implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-  
-	
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
-    @Column(name = "SUBSCRIBER_TYPE")
-    private String subscriberType;
-    @Id
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
-    @Column(name = "USERID")
-    private String userid;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
-    @Column(name = "FIRST_NAME")
-    private String firstName;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
-    @Column(name = "LAST_NAME")
-    private String lastName;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 30)
-    @Column(name = "EMAIL_ADDRESS")
-    private String emailAddress;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
-    @Column(name = "MOBILE_NUMBER")
-    private String mobileNumber;
-    @Size(max = 20)
-    @Column(name = "COUNTRY_NAME")
-    private String countryName;
-    @Size(max = 20)
-    @Column(name = "LANDLINE")
-    private String landline;
-    @Size(max = 20)
-    @Column(name = "DESIGNATION")
-    private String designation;
-    @Size(max = 20)
-    @Column(name = "COMPANY_NAME")
-    private String companyName;
-    @Size(max = 20)
-    @Column(name = "BUSINESS_TYPE")
-    private String businessType;
-    @Column(name = "INSERTED_DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date insertedDate;
-    @Column(name = "MODIFIED_DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date modifiedDate;
-    @Size(max = 30)
-    @Column(name = "BANK_NAME")
-    private String bankNbfcName;
-    @Size(max = 30)
-    @Column(name = "BRANCH_NAME")
-    private String branchName;
-    @Size(max = 30)
-    @Column(name = "SWIFT_CODE")
-    private String swiftCode;
-    
-    @Size(max = 100)
-    @Column(name = "REGISTERED_COUNTRY")
-    private String registredOffice;
-    
-    @Size(max = 20)
-    @Column(name = "TELEPHONE")
-    private String telephone;
-    @Size(max = 20)
-    @Column(name = "MIN_VALUEOF_LC")
-    private String minValueofLc;
+  private static final long serialVersionUID = 1L;
 
-    @Size(max = 20)
-    @Column(name = "REGISTRATION_TYPE")
-    private String registrationType;
-    @Size(max = 20)
-    @Column(name = "PROVINCENAME")
-    private String provincename;
-    @Size(max = 20)
-    @Column(name = "ADDRESS1")
-    private String address1;
-    @Size(max = 20)
-    @Column(name = "ADDRESS2")
-    private String address2;
-    @Size(max = 20)
-    @Column(name = "ADDRESS3")
-    private String address3;
-    @Size(max = 20)
-    @Column(name = "CITY")
-    private String city;
-    @Size(max = 20)
-    @Column(name = "PINCODE")
-    private String pincode;
-    
+	
+	@Column(name = "SUBSCRIBER_TYPE")
+	private String subscriberType;
+
+	@Id
+	@Basic(optional = false)
+	@NotNull
+	@Column(name = "USERID")
+	private String userid;
+
+
+	@Column(name = "FIRST_NAME")
+	private String firstName;
+
+
+	@Column(name = "LAST_NAME")
+	private String lastName;
+
+
+	@Column(name = "EMAIL_ADDRESS")
+	private String emailAddress;
+
+	
+	@Column(name = "MOBILE_NUMBER")
+	private String mobileNumber;
+
+	@Column(name = "COUNTRY_NAME")
+	private String countryName;
+
+	@Column(name = "LANDLINE")
+	private String landline;
+
+	@Column(name = "DESIGNATION")
+	private String designation;
+
+	@Column(name = "COMPANY_NAME")
+	private String companyName;
+
+	@Column(name = "BUSINESS_TYPE")
+	private String businessType;
+
+	@Column(name = "BANK_NAME")
+	private String bankNbfcName;
+
+	@Column(name = "BRANCH_NAME")
+	private String branchName;
+
+	@Column(name = "SWIFT_CODE")
+	private String swiftCode;
+
+	@Column(name = "MIN_VALUEOF_LC")
+	private String minValueofLc;
+
+	@Column(name = "TELEPHONE")
+	private String telephone;
+
+	@Column(name = "REGISTRATION_TYPE")
+	private String registrationType;
+
+	@Column(name = "PROVINCENAME")
+	private String provincename;
+
+	@Column(name = "ADDRESS1")
+	private String address1;
+
+	@Column(name = "ADDRESS2")
+	private String address2;
+
+	@Column(name = "ADDRESS3")
+	private String address3;
+
+	@Column(name = "CITY")
+	private String city;
+
+	@Column(name = "PINCODE")
+	private String pincode;
+
+	@Column(name = "REGISTERED_COUNTRY")
+	private String rgistredCountry;
+
+	@Column(name = "IS_REGISTER")
+	private Integer isRegister;
+
+	@Column(name = "IS_RMASSIGNED")
+	private Integer isRmassigned;
+
+	@Column(name = "RM_ID")
+	private String rmId;
+
+	@Column(name = "IS_BDETAILSFILLED")
+	private Integer isBdetailsfilled;
+
+	@Column(name = "IS_SPLANPURCHASED")
+	private Integer isSplanPurchased;
+
+	@Column(name = "MODE_OF_PAYMENT")
+	private String modeOfPayment;
+
+	@Column(name = "PAYMENT_STATUS")
+	private String paymentStatus;
+
+	@Column(name = "PAYMENT_DATE")
+	private Date paymentDate;
+
+	@Column(name = "KYC_STATUS")
+	private String kycStatus;
+
+	@Column(name = "KYC_APPROVALDATE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date kycApprovedDate;
+
+	@Column(name = "INSERTED_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date insertedDate;
+
+	@Column(name = "MODIFIED_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date modifiedDate;
+
+	@Column(name = "ACCOUNT_TYPE")
+	private String accountType;
+
+	@Column(name = "ACCOUNT_SOURCE")
+	private String accountSource;
+
+	@Column(name = "ACCOUNT_CREATED_DATE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date accountCreatedDate;
+
+	@Column(name = "ACCOUNT_STATUS")
+	private String accountStatus;
+
+	@Column(name = "CURRENCY_CODE")
+	private String currencyCode;
+
+	@Column(name = "EMAIL_ADDRESS1")
+	private String emailAddress1;
+
+	@Column(name = "EMAIL_ADDRESS2")
+	private String emailAddress2;
+
+	@Column(name = "EMAIL_ADDRESS3")
+	private String emailAddress3;    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid")
     private List<NimaiMLogin> nimaiMLoginList;
     
@@ -152,6 +199,276 @@ public class NimaiClient implements Serializable {
 
     
     
+
+    
+    
+    
+    
+	/**
+	 * @return the rgistredCountry
+	 */
+	public String getRgistredCountry() {
+		return rgistredCountry;
+	}
+
+	/**
+	 * @param rgistredCountry the rgistredCountry to set
+	 */
+	public void setRgistredCountry(String rgistredCountry) {
+		this.rgistredCountry = rgistredCountry;
+	}
+
+	/**
+	 * @return the isRegister
+	 */
+	public Integer getIsRegister() {
+		return isRegister;
+	}
+
+	/**
+	 * @param isRegister the isRegister to set
+	 */
+	public void setIsRegister(Integer isRegister) {
+		this.isRegister = isRegister;
+	}
+
+	/**
+	 * @return the isRmassigned
+	 */
+	public Integer getIsRmassigned() {
+		return isRmassigned;
+	}
+
+	/**
+	 * @param isRmassigned the isRmassigned to set
+	 */
+	public void setIsRmassigned(Integer isRmassigned) {
+		this.isRmassigned = isRmassigned;
+	}
+
+	/**
+	 * @return the rmId
+	 */
+	public String getRmId() {
+		return rmId;
+	}
+
+	/**
+	 * @param rmId the rmId to set
+	 */
+	public void setRmId(String rmId) {
+		this.rmId = rmId;
+	}
+
+	/**
+	 * @return the isBdetailsfilled
+	 */
+	public Integer getIsBdetailsfilled() {
+		return isBdetailsfilled;
+	}
+
+	/**
+	 * @param isBdetailsfilled the isBdetailsfilled to set
+	 */
+	public void setIsBdetailsfilled(Integer isBdetailsfilled) {
+		this.isBdetailsfilled = isBdetailsfilled;
+	}
+
+	/**
+	 * @return the isSplanPurchased
+	 */
+	public Integer getIsSplanPurchased() {
+		return isSplanPurchased;
+	}
+
+	/**
+	 * @param isSplanPurchased the isSplanPurchased to set
+	 */
+	public void setIsSplanPurchased(Integer isSplanPurchased) {
+		this.isSplanPurchased = isSplanPurchased;
+	}
+
+	/**
+	 * @return the modeOfPayment
+	 */
+	public String getModeOfPayment() {
+		return modeOfPayment;
+	}
+
+	/**
+	 * @param modeOfPayment the modeOfPayment to set
+	 */
+	public void setModeOfPayment(String modeOfPayment) {
+		this.modeOfPayment = modeOfPayment;
+	}
+
+	/**
+	 * @return the paymentStatus
+	 */
+	public String getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	/**
+	 * @param paymentStatus the paymentStatus to set
+	 */
+	public void setPaymentStatus(String paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+
+	/**
+	 * @return the paymentDate
+	 */
+	public Date getPaymentDate() {
+		return paymentDate;
+	}
+
+	/**
+	 * @param paymentDate the paymentDate to set
+	 */
+	public void setPaymentDate(Date paymentDate) {
+		this.paymentDate = paymentDate;
+	}
+
+	/**
+	 * @return the kycStatus
+	 */
+	public String getKycStatus() {
+		return kycStatus;
+	}
+
+	/**
+	 * @param kycStatus the kycStatus to set
+	 */
+	public void setKycStatus(String kycStatus) {
+		this.kycStatus = kycStatus;
+	}
+
+	/**
+	 * @return the kycApprovedDate
+	 */
+	public Date getKycApprovedDate() {
+		return kycApprovedDate;
+	}
+
+	/**
+	 * @param kycApprovedDate the kycApprovedDate to set
+	 */
+	public void setKycApprovedDate(Date kycApprovedDate) {
+		this.kycApprovedDate = kycApprovedDate;
+	}
+
+	/**
+	 * @return the accountType
+	 */
+	public String getAccountType() {
+		return accountType;
+	}
+
+	/**
+	 * @param accountType the accountType to set
+	 */
+	public void setAccountType(String accountType) {
+		this.accountType = accountType;
+	}
+
+	/**
+	 * @return the accountSource
+	 */
+	public String getAccountSource() {
+		return accountSource;
+	}
+
+	/**
+	 * @param accountSource the accountSource to set
+	 */
+	public void setAccountSource(String accountSource) {
+		this.accountSource = accountSource;
+	}
+
+	/**
+	 * @return the accountCreatedDate
+	 */
+	public Date getAccountCreatedDate() {
+		return accountCreatedDate;
+	}
+
+	/**
+	 * @param accountCreatedDate the accountCreatedDate to set
+	 */
+	public void setAccountCreatedDate(Date accountCreatedDate) {
+		this.accountCreatedDate = accountCreatedDate;
+	}
+
+	/**
+	 * @return the accountStatus
+	 */
+	public String getAccountStatus() {
+		return accountStatus;
+	}
+
+	/**
+	 * @param accountStatus the accountStatus to set
+	 */
+	public void setAccountStatus(String accountStatus) {
+		this.accountStatus = accountStatus;
+	}
+
+	/**
+	 * @return the currencyCode
+	 */
+	public String getCurrencyCode() {
+		return currencyCode;
+	}
+
+	/**
+	 * @param currencyCode the currencyCode to set
+	 */
+	public void setCurrencyCode(String currencyCode) {
+		this.currencyCode = currencyCode;
+	}
+
+	/**
+	 * @return the emailAddress1
+	 */
+	public String getEmailAddress1() {
+		return emailAddress1;
+	}
+
+	/**
+	 * @param emailAddress1 the emailAddress1 to set
+	 */
+	public void setEmailAddress1(String emailAddress1) {
+		this.emailAddress1 = emailAddress1;
+	}
+
+	/**
+	 * @return the emailAddress2
+	 */
+	public String getEmailAddress2() {
+		return emailAddress2;
+	}
+
+	/**
+	 * @param emailAddress2 the emailAddress2 to set
+	 */
+	public void setEmailAddress2(String emailAddress2) {
+		this.emailAddress2 = emailAddress2;
+	}
+
+	/**
+	 * @return the emailAddress3
+	 */
+	public String getEmailAddress3() {
+		return emailAddress3;
+	}
+
+	/**
+	 * @param emailAddress3 the emailAddress3 to set
+	 */
+	public void setEmailAddress3(String emailAddress3) {
+		this.emailAddress3 = emailAddress3;
+	}
 
 	/**
 	 * @return the nimaiReferList
@@ -340,13 +657,7 @@ public class NimaiClient implements Serializable {
         this.swiftCode = swiftCode;
     }
 
-    public String getRegistredOffice() {
-        return registredOffice;
-    }
 
-    public void setRegistredOffice(String registredOffice) {
-        this.registredOffice = registredOffice;
-    }
 
     public String getTelephone() {
         return telephone;
@@ -479,15 +790,23 @@ public class NimaiClient implements Serializable {
 		return "NimaiClient [subscriberType=" + subscriberType + ", userid=" + userid + ", firstName=" + firstName
 				+ ", lastName=" + lastName + ", emailAddress=" + emailAddress + ", mobileNumber=" + mobileNumber
 				+ ", countryName=" + countryName + ", landline=" + landline + ", designation=" + designation
-				+ ", companyName=" + companyName + ", businessType=" + businessType + ", insertedDate=" + insertedDate
-				+ ", modifiedDate=" + modifiedDate + ", bankNbfcName=" + bankNbfcName + ", branchName=" + branchName
-				+ ", swiftCode=" + swiftCode + ", registredOffice=" + registredOffice + ", telephone=" + telephone
-				+ ", minValueofLc=" + minValueofLc + ", registrationType=" + registrationType + ", provincename="
+				+ ", companyName=" + companyName + ", businessType=" + businessType + ", bankNbfcName=" + bankNbfcName
+				+ ", branchName=" + branchName + ", swiftCode=" + swiftCode + ", minValueofLc=" + minValueofLc
+				+ ", telephone=" + telephone + ", registrationType=" + registrationType + ", provincename="
 				+ provincename + ", address1=" + address1 + ", address2=" + address2 + ", address3=" + address3
-				+ ", city=" + city + ", pincode=" + pincode + ", nimaiMLoginList=" + nimaiMLoginList + "]";
+				+ ", city=" + city + ", pincode=" + pincode + ", rgistredCountry=" + rgistredCountry + ", isRegister="
+				+ isRegister + ", isRmassigned=" + isRmassigned + ", rmId=" + rmId + ", isBdetailsfilled="
+				+ isBdetailsfilled + ", isSplanPurchased=" + isSplanPurchased + ", modeOfPayment=" + modeOfPayment
+				+ ", paymentStatus=" + paymentStatus + ", paymentDate=" + paymentDate + ", kycStatus=" + kycStatus
+				+ ", kycApprovedDate=" + kycApprovedDate + ", insertedDate=" + insertedDate + ", modifiedDate="
+				+ modifiedDate + ", accountType=" + accountType + ", accountSource=" + accountSource
+				+ ", accountCreatedDate=" + accountCreatedDate + ", accountStatus=" + accountStatus + ", currencyCode="
+				+ currencyCode + ", emailAddress1=" + emailAddress1 + ", emailAddress2=" + emailAddress2
+				+ ", emailAddress3=" + emailAddress3 + ", nimaiMLoginList=" + nimaiMLoginList + ", nimaiFSubList="
+				+ nimaiFSubList + ", nimaiBranchList=" + nimaiBranchList + ", nimaiReferList=" + nimaiReferList + "]";
 	}
 
-	
+
 
  
     

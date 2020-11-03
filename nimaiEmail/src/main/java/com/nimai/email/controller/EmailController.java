@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,12 +26,9 @@ import com.nimai.email.bean.UserRegistrationBean;
 import com.nimai.email.service.UserService;
 import com.nimai.email.utility.EmaiInsert;
 
+
 /**
- * @author ASUS
- *
- */
-/**
- * @author ASUS
+ * @author Dhiraj
  *
  */
 /**
@@ -64,6 +62,7 @@ public class EmailController {
 
 	/*
 	 * email sending api for refer and subsidiary user
+	 * In refer angular end should send referenceId
 	 */
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping("/sendSubsidiaryAcivationLink")
@@ -114,35 +113,6 @@ public class EmailController {
 
 	}
 
-	/* email alert to customer when uploading,rejecting,reopening the lc */
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping("/sendTransactionStatus")
-	public ResponseEntity<?> sendLcUploadStatusToCustomer(@RequestBody LcUploadBean lcUploadBean) {
-		logger.info(" ================ sendLcUploadStatusToCustomer API Invoked ================:"
-				+ lcUploadBean.toString());
-		return userEmailService.sendTransactionStatus(lcUploadBean);
-
-	}
-
-	/*
-	 * email alert to customer when lc uploading,rejecting,reopening the lc with lc
-	 * details
-	 */
-	@RequestMapping("/sendLcStatus")
-	public ResponseEntity<?> sendLcUploadStatusEmail(@RequestBody LcUploadBean lcUploadBean) {
-		logger.info("==========inside sendLcUploadStatusEmail API invoked===========");
-		return userEmailService.sendLcUploadStatus(lcUploadBean);
-	}
-
-	/* sending the email after customer accept or reject the quotation to banks */
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping("/sendKYCStatusToCustomer")
-	public ResponseEntity<?> sendKYCStatusToCustomer(@RequestBody KycEmailRequest kycReq) {
-		logger.info(" ================ sendKYCStatusToCustomer API Invoked ================:" + kycReq.toString());
-		return userEmailService.sendKYCStatus(kycReq);
-
-	}
-	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping("/sendAdminSetPasswordLink")
 	public ResponseEntity<?> sendAdminResetPasswordLink(@RequestBody AdminBean adminBean) throws Exception {
@@ -150,4 +120,5 @@ public class EmailController {
 				" ================ Send resetPaasword Link API is  Invoked ================" + adminBean.toString());
 		return userEmailService.sendAdminEmail(adminBean);
 	}
+
 }

@@ -71,6 +71,11 @@ public class NimaiMLogin implements Serializable {
 	@Column(name = "TOKEN_EXPIRY_DATE")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date tokenExpiryDate;
+
+	
+	
+	
+	
 	
 //	@Column(name = "RESET_PASSWORD_STATUS")
 //	private String resetPasswordStatus;
@@ -85,6 +90,10 @@ public class NimaiMLogin implements Serializable {
 //	public void setResetFlag(int resetFlag) {
 //		this.resetFlag = resetFlag;
 //	}
+
+
+
+
 
 	// @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id

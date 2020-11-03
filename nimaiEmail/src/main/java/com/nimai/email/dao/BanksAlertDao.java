@@ -15,9 +15,19 @@ public interface BanksAlertDao {
 
 	void deleteEmailTransactionDetail(int scedulerid);
 
-	NimaiLC getTransactioDetailsByTransIs(String transactionid);
+	NimaiLC getTransactioDetailsByTransId(String transactionid);
 
 	NimaiClient getCustDetailsByUserId(String transactionid);
 
 	QuotationMaster getDetailsByQuoteId(int quotationId);
+
+	void updateEmailFlag(int scedulerid);
+
+	List<NimaiEmailSchedulerAlertToBanks> getTransactionDetailByTrEmailStatus();
+
+	void updateTrStatusEmailFlag(int schedulerId);
+
+	void updateTREmailStatus(int scedulerid);
+
+	void updateBankEmailFlag(int scedulerid);
 }

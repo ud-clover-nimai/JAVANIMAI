@@ -1,7 +1,7 @@
 package com.nimai.email.bean;
 
 import java.io.File;
-
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -10,6 +10,7 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.Message;
@@ -179,7 +180,7 @@ public class EmailContentBean {
 		this.fromEmailAddress = fromEmailAddress;
 	}
 
-	public void sendEmail() throws MessagingException {
+	public void sendEmail() throws MessagingException, SocketTimeoutException {
 
 		try {
 			System.out.println(" ************* EmailContentBean.sendEmail() ************* ");
@@ -359,9 +360,10 @@ public class EmailContentBean {
 //
 //			}
 
-		} catch (MailSendException  e) {
+		}
+		 catch (MailSendException  e) {
 			e.printStackTrace(System.out);
-			
+			 detectInvalidAddress(e);
 			  System.out.println("In Send mail exception Start");
 			  
 			  // loggingService.saveExceptionLog("sendmail", //
@@ -408,5 +410,23 @@ public class EmailContentBean {
 		}
 
 	}
+	private void detectInvalidAddress(MailSendException me) {
+	    Exception[] messageExceptions = me.getMessageExceptions();
+	    if (messageExceptions.length > 0) {
+	        Exception messageException = messageExceptions[0];
+	        if (messageException instanceof SendFailedException) {
+	            SendFailedException sfe = (SendFailedException) messageException;
+	            Address[] invalidAddresses = sfe.getInvalidAddresses();
+	            StringBuilder addressStr = new StringBuilder();
+	            for (Address address : invalidAddresses) {
+	                addressStr.append(address.toString()).append("; ");
+	            }
 
+	            logger.error("invalid address(es)：{}", addressStr);
+	            return;
+	        }
+	    }
+
+	    logger.error("exception while sending mail.", me);
+	}
 }

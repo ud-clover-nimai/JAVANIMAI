@@ -1,4 +1,4 @@
-  package com.nimai.email.entity;
+package com.nimai.email.entity;
 
 import java.util.Date;
 
@@ -413,7 +413,23 @@ public class QuotationMaster
 		this.lastName = lastName;
 	}
 
-	
-	
-	
+	@Override
+	public String toString() {
+		return "QuotationMaster [quotationId=" + quotationId + ", transactionId=" + transactionId + ", userId=" + userId
+				+ ", bankUserId=" + bankUserId + ", confirmationCharges=" + confirmationCharges
+				+ ", confChgsIssuanceToNegot=" + confChgsIssuanceToNegot + ", confChgsIssuanceToexp="
+				+ confChgsIssuanceToexp + ", confChgsIssuanceToMatur=" + confChgsIssuanceToMatur
+				+ ", discountingCharges=" + discountingCharges + ", refinancingCharges=" + refinancingCharges
+				+ ", bankAcceptCharges=" + bankAcceptCharges + ", applicableBenchmark=" + applicableBenchmark
+				+ ", commentsBenchmark=" + commentsBenchmark + ", negotiationChargesFixed=" + negotiationChargesFixed
+				+ ", negotiationChargesPerct=" + negotiationChargesPerct + ", docHandlingCharges=" + docHandlingCharges
+				+ ", otherCharges=" + otherCharges + ", chargesType=" + chargesType + ", minTransactionCharges="
+				+ minTransactionCharges + ", insertedDate=" + insertedDate + ", insertedBy=" + insertedBy
+				+ ", modifiedDate=" + modifiedDate + ", modifiedBy=" + modifiedBy + ", quotationStatus="
+				+ quotationStatus + ", totalQuoteValue=" + totalQuoteValue + ", validityDate=" + validityDate
+				+ ", bankName=" + bankName + ", branchName=" + branchName + ", swiftCode=" + swiftCode
+				+ ", countryName=" + countryName + ", emailAddress=" + emailAddress + ", telephone=" + telephone
+				+ ", mobileNumber=" + mobileNumber + ", firstName=" + firstName + ", lastName=" + lastName + "]";
+	}
+
 }

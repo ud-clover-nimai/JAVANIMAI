@@ -23,18 +23,6 @@ public class BanksAlertEmailController {
 	@Autowired
 	BanksALertEmailService banksAlertService;
 
-	/*
-	 * getting eligible banks to send email for lc upload,update(Email ALerts to
-	 * banks)
-	 */
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping("/getEligibleEmails")
-	public ResponseEntity<?> getEligibleBanksEmail(@RequestBody AlertToBanksBean alertBanksBean) {
-		logger.info("======inside getEligibleBanksEmail=====" + alertBanksBean.getEvent());
-		return banksAlertService.getAlleligibleBAnksEmail(alertBanksBean);
-
-	}
-
 	/* sending the email after customer uploading lc to eligible banks */
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping("/sendTransactionStatusToBanks")
@@ -53,14 +41,6 @@ public class BanksAlertEmailController {
 				" ================ sendQuotationStatusToBanks API Invoked ================:" + qauotatioReq.toString());
 		return banksAlertService.sendQuotationStatusToBanks(qauotatioReq);
 
-	}
-
-	/* sending the email by applying scheduled */
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping(value="/sendTransactionStatusToBanksByScheduled")
-	@Scheduled(fixedDelay = 300000)
-	public ResponseEntity<?> sendLcUploadStatusToBanksByScheduled() {
-		return banksAlertService.sendTransactionStatusToBanksByScheduled();
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.nimai.email.dao;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 import javax.mail.MessagingException;
@@ -32,7 +33,7 @@ public class EmailProcessImpl {
 	@Autowired
 	EmailConversionUtil emailConversionUtil;
 	
-	public void sendemail(ArrayList output) throws MessagingException {
+	public void sendemail(ArrayList output) throws MessagingException, SocketTimeoutException {
 		System.out.println("email service provider impl size : " + output.size());
 		emailServiceProviderImpl.sendemail(output);
 

@@ -7,8 +7,6 @@ import com.nimai.email.bean.QuotationAlertRequest;
 
 public interface BanksALertEmailService {
 
-	ResponseEntity<?> getAlleligibleBAnksEmail(AlertToBanksBean alertBanksBean);
-
 	ResponseEntity<?> sendTransactionStatusToBanks(AlertToBanksBean alertBanksBean);
 
 	ResponseEntity<?> sendQuotationStatusToBanks(QuotationAlertRequest qauotatioReq);

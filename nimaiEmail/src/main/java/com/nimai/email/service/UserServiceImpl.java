@@ -1,13 +1,21 @@
 package com.nimai.email.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.nimai.email.api.GenericResponse;
 import com.nimai.email.bean.AdminBean;
 import com.nimai.email.bean.BranchUserPassCodeBean;
 import com.nimai.email.bean.BranchUserRequest;
+import com.nimai.email.bean.EodReport;
 import com.nimai.email.bean.KycEmailRequest;
 import com.nimai.email.bean.LcUploadBean;
 import com.nimai.email.bean.SubsidiaryBean;
@@ -30,6 +42,7 @@ import com.nimai.email.dao.EmailProcessImpl;
 import com.nimai.email.dao.UserServiceDao;
 import com.nimai.email.entity.EmailComponentMaster;
 import com.nimai.email.entity.NimaiClient;
+import com.nimai.email.entity.NimaiEmailScheduler;
 import com.nimai.email.entity.NimaiFSubsidiaries;
 import com.nimai.email.entity.NimaiLC;
 import com.nimai.email.entity.NimaiMBranch;
@@ -49,6 +62,12 @@ public class UserServiceImpl implements UserService {
 	private static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Autowired
+	JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	EmailConfigurationdaoImpl emailConfigurationDAO;
+
+	@Autowired
 	UserServiceDao userDao;
 
 	@Autowired
@@ -62,13 +81,13 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	EmailSend emailSend;
-	
+
 	@Autowired
 	private Utils utility;
 
 	@Autowired
 	EmailConfigurationdaoImpl emailConfigurationDAOImpl;
-	
+
 	@Autowired
 	ResetUserValidation resetUserValidator;
 
@@ -115,10 +134,11 @@ public class UserServiceImpl implements UserService {
 					logger.info(" ========Inside UserServiceImpl==============" + userId);
 					String tokenKey = utility.generatePasswordResetToken();
 					Date tokenExpiry = utility.getLinkExpiryDate();
-
 					nimaiLogin.setTokenExpiryDate(tokenExpiry);
 					nimaiLogin.setToken(tokenKey);
+
 					userDao.update(nimaiLogin);
+
 					try {
 						String aCLlink = accountActivationLink + tokenKey;
 						String fPlink = forgorPasswordLink + tokenKey;
@@ -127,6 +147,7 @@ public class UserServiceImpl implements UserService {
 
 							emailInsert.resetPasswordEmail(aCLlink, userRegistratinBean, nimaiLogin,
 									nimaiClientdetails);
+
 						} else if (userRegistratinBean.getEvent().equalsIgnoreCase("FORGOT_PASSWORD")) {
 							emailInsert.resetForgorPasswordEmail(fPlink, userRegistratinBean,
 									userRegistratinBean.getEmail(), clientUseId);
@@ -157,6 +178,91 @@ public class UserServiceImpl implements UserService {
 		response.setErrCode("ASA005");
 		response.setMessage(ErrorDescription.getDescription("ASA005"));
 		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+	}
+
+	@Override
+	@Scheduled(fixedDelay = 30000)
+	public void sendAccountEmail() throws Exception {
+		GenericResponse response = new GenericResponse();
+
+		List<NimaiEmailScheduler> emailDetailsScheduled = userDao.getSchedulerDetails();
+		for (NimaiEmailScheduler schdulerData : emailDetailsScheduled) {
+			if (schdulerData.getEvent().equalsIgnoreCase("Cust_Splan_email")) {
+				try {
+					NimaiClient clientUseId = userDao.getClientDetailsbyUserId(schdulerData.getUserid());
+
+					emailInsert.sendCustSPlanEmail(schdulerData, clientUseId);
+					// int scedulerid = schdulerData.getAccountSchedulerId();
+					userDao.updateEmailStatus(schdulerData.getAccountSchedulerId());
+					response.setErrCode("ASA002");
+					response.setMessage(ErrorDescription.getDescription("ASA002"));
+
+				} catch (Exception e) {
+					if (e instanceof NullPointerException) {
+						response.setMessage("Email Sending failed");
+						EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+						response.setData(emailError);
+
+					}
+
+				}
+
+			} else if (schdulerData.getEvent().equalsIgnoreCase("KYC_UPLOAD")
+					|| schdulerData.getEvent().equalsIgnoreCase("KYC_APPROVED")
+					|| schdulerData.getEvent().equalsIgnoreCase("KYC_REJECT")) {
+				NimaiClient clientUserId = userDao.getClientDetailsbyUserId(schdulerData.getUserid());
+				if (clientUserId != null) {
+					if (schdulerData.getrMemailId() != null) {
+						try {
+							/* method for email sending to customer kyc */
+							emailInsert.sendKycEmail(schdulerData.getEvent(), clientUserId, schdulerData);
+							try {
+								/* method for sending the email to rm kyc */
+								emailInsert.sendEmailToRm(schdulerData.getEvent(), clientUserId, schdulerData);
+							} catch (Exception e) {
+								if (e instanceof NullPointerException) {
+									response.setMessage("Email Sending failed");
+									EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+									response.setData(emailError);
+
+								}
+							}
+							// int scedulerid = schdulerData.getAccountSchedulerId();
+							userDao.updateEmailStatus(schdulerData.getAccountSchedulerId());
+							response.setMessage(ErrorDescription.getDescription("ASA002"));
+
+						} catch (Exception e) {
+							if (e instanceof NullPointerException) {
+								response.setMessage("Email Sending failed");
+								EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+								response.setData(emailError);
+
+							}
+						}
+					} else {
+						try {
+							/* method for email sending to customer kyc */
+							emailInsert.sendKycEmail(schdulerData.getEvent(), clientUserId, schdulerData);
+							int scedulerid = schdulerData.getAccountSchedulerId();
+							userDao.updateEmailStatus(scedulerid);
+							response.setMessage(ErrorDescription.getDescription("ASA002"));
+						} catch (Exception e) {
+							if (e instanceof NullPointerException) {
+								response.setMessage("Email Sending failed");
+								EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+								response.setData(emailError);
+
+							}
+						}
+					}
+				} else {
+					response.setErrCode("ASA001");
+					response.setMessage(ErrorDescription.getDescription("ASA001"));
+
+				}
+
+			}
+		}
 	}
 
 	public ResponseEntity<Object> validateResetPasswordLink(String tokenKey) {
@@ -227,22 +333,26 @@ public class UserServiceImpl implements UserService {
 							}
 
 						} else if (subsidiaryBean.getEvent().equalsIgnoreCase("ADD_REFER")) {
-							String refertokenKey = ("RE")
-									.concat(userId.concat("_").concat(utility.generatePasswordResetToken()));
-							System.out.println(refertokenKey);
-							NimaiMRefer referUser = new NimaiMRefer();
-							String token = tokenKey.substring(tokenKey.indexOf("_") + 1);
-							Calendar cal = Calendar.getInstance();
-							Date insertedDate = cal.getTime();
-							Date tokenExpiry = utility.getLinkExpiryDate();
-							referUser.setTokenExpiryTime(tokenExpiry);
-							referUser.setToken(refertokenKey);
-							referUser.setUserid(clientUseId);
-							referUser.setTokenInsertedDate(insertedDate);
-							referUser.setEmailAddress(subsidiaryBean.getEmailId());
-							userDao.saveReferTokenDetails(referUser);
-							response.setFlag(1);
-							link = referAccountActivationLink + tokenKey;
+
+							NimaiMRefer referDetails = userDao.getreferDetails(subsidiaryBean.getReferenceId());
+							if (referDetails != null) {
+								String refertokenKey = ("RE")
+										.concat(userId.concat("_").concat(utility.generatePasswordResetToken()));
+								System.out.println(refertokenKey);
+								NimaiMRefer referUser = new NimaiMRefer();
+								String token = tokenKey.substring(tokenKey.indexOf("_") + 1);
+								Calendar cal = Calendar.getInstance();
+								Date insertedDate = cal.getTime();
+								Date tokenExpiry = utility.getLinkExpiryDate();
+								userDao.updateReferTokenDetails(tokenExpiry, refertokenKey, clientUseId, insertedDate,
+										subsidiaryBean.getEmailId(), subsidiaryBean.getReferenceId());
+								response.setFlag(1);
+								link = referAccountActivationLink + refertokenKey;
+							} else {
+								response.setMessage("Refer Id Entry not Present");
+								return new ResponseEntity<Object>(response, HttpStatus.OK);
+							}
+
 						}
 						emailInsert.sendSubAccAcivationLink(link, subsidiaryBean);
 						response.setErrCode("ASA002");
@@ -423,21 +533,22 @@ public class UserServiceImpl implements UserService {
 						userDao.updateBranchUser(branchUserDetails);
 						urltoken = tokenKey.concat("_").concat(passcode);
 						bUlink = subAccountActivationLink + urltoken;
-					}
-					try {
-						emailInsert.sendBranchUserActivationLink(bUlink, branchUserLink, passcode);
-						response.setErrCode("ASA002");
-						response.setData(urltoken);
-						response.setMessage(ErrorDescription.getDescription("ASA002"));
-						return new ResponseEntity<Object>(response, HttpStatus.OK);
-					} catch (Exception e) {
-						if (e instanceof NullPointerException) {
-							response.setMessage("Email Sending failed");
-							EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
-							response.setData(emailError);
-							return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+						try {
+							emailInsert.sendBranchUserActivationLink(bUlink, branchUserLink, passcode);
+							response.setErrCode("ASA002");
+							response.setData(urltoken);
+							response.setMessage(ErrorDescription.getDescription("ASA002"));
+							return new ResponseEntity<Object>(response, HttpStatus.OK);
+						} catch (Exception e) {
+							if (e instanceof NullPointerException) {
+								response.setMessage("Email Sending failed");
+								EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+								response.setData(emailError);
+								return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+							}
 						}
 					}
+
 				} else {
 
 					passcode = utility.passcodeValue();
@@ -451,20 +562,20 @@ public class UserServiceImpl implements UserService {
 							tokenExpiry);
 					urltoken = tokenKey.concat("_").concat(passcode);
 					link = subAccountActivationLink + urltoken;
-				}
-				try {
+					try {
 
-					emailInsert.sendBranchUserActivationLink(link, branchUserLink, passcode);
-					response.setErrCode("ASA002");
-					response.setData(urltoken);
-					response.setMessage(ErrorDescription.getDescription("ASA002"));
-					return new ResponseEntity<Object>(response, HttpStatus.OK);
-				} catch (Exception e) {
-					if (e instanceof NullPointerException) {
-						response.setMessage("Email Sending failed");
-						EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
-						response.setData(emailError);
-						return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+						emailInsert.sendBranchUserActivationLink(link, branchUserLink, passcode);
+						response.setErrCode("ASA002");
+						response.setData(urltoken);
+						response.setMessage(ErrorDescription.getDescription("ASA002"));
+						return new ResponseEntity<Object>(response, HttpStatus.OK);
+					} catch (Exception e) {
+						if (e instanceof NullPointerException) {
+							response.setMessage("Email Sending failed");
+							EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+							response.setData(emailError);
+							return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+						}
 					}
 				}
 
@@ -479,117 +590,6 @@ public class UserServiceImpl implements UserService {
 		response.setMessage("Branch Id not found");
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
-	}
-
-	@Override
-	public ResponseEntity<?> sendTransactionStatus(LcUploadBean lcUploadBean) {
-		logger.info("==========sendTransactionStatus mthod invoked========" + lcUploadBean.toString());
-		GenericResponse response = new GenericResponse<>();
-		String errorString = this.resetUserValidator.lcValidation(lcUploadBean);
-		if (errorString.equalsIgnoreCase("Success")) {
-			NimaiClient clientUserId = userDao.getClientDetailsbyUserId(lcUploadBean.getUserId());
-			if (clientUserId != null) {
-				try {
-					emailInsert.sendTransactionStatusEmail(lcUploadBean.getEvent(), lcUploadBean,
-							clientUserId.getEmailAddress());
-					response.setMessage(ErrorDescription.getDescription("ASA002"));
-					return new ResponseEntity<Object>(response, HttpStatus.OK);
-				} catch (Exception e) {
-					if (e instanceof NullPointerException) {
-						response.setMessage("Email Sending failed");
-						EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
-						response.setData(emailError);
-						return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
-					}
-				}
-			} else {
-				response.setErrCode("ASA001");
-				response.setMessage(ErrorDescription.getDescription("ASA001"));
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-			}
-		} else {
-			response.setErrCode("EX000");
-			response.setMessage(ErrorDescription.getDescription("EX000") + errorString.toString());
-			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-		}
-		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-	}
-
-	@Override
-	public ResponseEntity<?> sendLcUploadStatus(LcUploadBean lcUploadBean) {
-		logger.info("==========sendTransactionStatus mthod invoked========" + lcUploadBean.toString());
-		GenericResponse response = new GenericResponse<>();
-		String errorString = this.resetUserValidator.lcValidation(lcUploadBean);
-		if (errorString.equalsIgnoreCase("Success")) {
-			NimaiClient clientUserId = userDao.getClientDetailsbyUserId(lcUploadBean.getUserId());
-			if (clientUserId != null) {
-				String userName = clientUserId.getFirstName();
-				System.out.println(userName);
-				try {
-					NimaiLC transactionDetails = userDao.getTransactioDetailsByTransIs(lcUploadBean.getTransactionid());
-					if (transactionDetails != null) {
-						emailInsert.sendLcStatusEmailWithData(lcUploadBean.getEvent(), lcUploadBean, userName,
-								clientUserId.getEmailAddress(), transactionDetails);
-						response.setMessage(ErrorDescription.getDescription("ASA002"));
-						return new ResponseEntity<Object>(response, HttpStatus.OK);
-					} else {
-						response.setMessage("Transaction Id not found");
-						return new ResponseEntity<Object>(response, HttpStatus.OK);
-					}
-				} catch (Exception e) {
-					if (e instanceof NullPointerException) {
-						response.setMessage("Email Sending failed");
-						EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
-						response.setData(emailError);
-						return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
-					}
-				}
-			} else {
-				response.setErrCode("ASA001");
-				response.setMessage(ErrorDescription.getDescription("ASA001"));
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-			}
-		} else {
-			response.setErrCode("EX000");
-			response.setMessage(ErrorDescription.getDescription("EX000") + errorString.toString());
-			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-		}
-		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-
-	}
-
-	
-	@Override
-	public ResponseEntity<?> sendKYCStatus(KycEmailRequest kycReq) {
-		logger.info("============sendKYCStatus method invoked=======");
-		GenericResponse response = new GenericResponse<>();
-		String errorString = this.resetUserValidator.kycValidation(kycReq);
-		if (errorString.equalsIgnoreCase("Success")) {
-			NimaiClient clientUserId = userDao.getClientDetailsbyUserId(kycReq.getUserId());
-			if (clientUserId != null) {
-				try {
-					emailInsert.sendKycStatusEmail(kycReq.getEvent(), kycReq, clientUserId.getEmailAddress());
-					response.setMessage(ErrorDescription.getDescription("ASA002"));
-					return new ResponseEntity<Object>(response, HttpStatus.OK);
-				} catch (Exception e) {
-					if (e instanceof NullPointerException) {
-						response.setMessage("Email Sending failed");
-						EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
-						response.setData(emailError);
-						return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
-					}
-				}
-			} else {
-				response.setErrCode("ASA001");
-				response.setMessage(ErrorDescription.getDescription("ASA001"));
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-			}
-		} else {
-			response.setErrCode("EX000");
-			response.setMessage(ErrorDescription.getDescription("EX000") + errorString.toString());
-			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-		}
-		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
 	@Override
@@ -655,7 +655,7 @@ public class UserServiceImpl implements UserService {
 		response.setMessage(ErrorDescription.getDescription("ASA005"));
 		return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
 	}
-	
+
 	public void AdminEmail(AdminBean resetpassword) throws Exception {
 
 		EmailComponentMaster emailconfigurationBean = null;
@@ -697,12 +697,48 @@ public class UserServiceImpl implements UserService {
 		}
 
 	}
-	
-	
-	
-}
 
-//		} finally {
-//			em.close();
-//
-//		}
+	@Override
+//@Scheduled(cron = "0 0 23 0 0 MON-SAT")
+	public ByteArrayInputStream generateEodReport() {
+		// TODO Auto-generated method stub
+
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = new Date();
+		java.sql.Date todaysdate = new java.sql.Date(new java.util.Date().getTime());
+		System.out.println(todaysdate);
+		List<NimaiLC> customerList = userDao.getCustTransactionList(todaysdate);
+		System.out.println(customerList.toString());
+		Map<String, List<NimaiLC>> groupByUserId = customerList.stream()
+				.collect(Collectors.groupingBy(NimaiLC::getUserId));
+		System.out.println("New generated methods inside the generate Eod Report" + groupByUserId.toString());
+		ArrayList<String> fileLocationArrayList = new ArrayList<>();
+		for (Map.Entry<String, List<NimaiLC>> entry : groupByUserId.entrySet()) {
+			try {
+				String fileLocation = com.nimai.email.utility.ExcelUtility.generateReportToExcel(entry.getKey(),
+						entry.getValue());
+				System.out.println("filelocation name in the middle" + fileLocation);
+				for (String filePresent : fileLocationArrayList)
+					if (!filePresent.equalsIgnoreCase(fileLocation) && filePresent != null && !filePresent.isEmpty()) {
+						try {
+							boolean emailStatus = emailInsert.sendEodReport(fileLocation, entry.getKey());
+							if (emailStatus != false) {
+								System.out.println("false conditions");
+								fileLocationArrayList.add(fileLocation);
+							}
+
+						} catch (Exception e) {
+
+						}
+					}
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return null;
+
+	}
+}

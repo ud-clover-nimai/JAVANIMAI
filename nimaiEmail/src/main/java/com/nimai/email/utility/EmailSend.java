@@ -57,7 +57,7 @@ public class EmailSend {
      */
     public void getDetailsEmail() throws Exception {
         //Session session = HibernateUtil.getSessionFactory().openSession();
-//        try {
+        try {
             ArrayList<EmailDetails> results = new ArrayList<EmailDetails>();
             results = emailDao.getAllemail();
             int emailID;
@@ -83,11 +83,11 @@ public class EmailSend {
                     System.out.println("EmailDetails Table is updated for emaildetailid = " + emailID);
                 }
             }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            logger.info("Exception-1" + e.getMessage());
-//            System.out.println("before sending email-1" + e.getMessage());
-//        }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("Exception-1" + e.getMessage());
+            System.out.println("before sending email-1" + e.getMessage());
+        }
     }
 
     public boolean confirmSMTP() {
