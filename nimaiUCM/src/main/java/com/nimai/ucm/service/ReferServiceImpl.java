@@ -1,5 +1,7 @@
 package com.nimai.ucm.service;
 
+import java.util.Calendar;
+
 
 import java.util.List;
 
@@ -8,9 +10,13 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+import com.nimai.ucm.bean.GenericResponse;
 import com.nimai.ucm.bean.ReferBean;
 import com.nimai.ucm.entity.Refer;
 import com.nimai.ucm.repository.ReferRepository;
@@ -18,19 +24,21 @@ import com.nimai.ucm.utility.ReferenceIdUniqueNumber;
 
 @Service
 @Transactional
-public class ReferServiceImpl implements ReferService{
-	
+public class ReferServiceImpl implements ReferService {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReferServiceImpl.class);
-	
+
 	@Autowired
 	ReferRepository referRepo;
 
+
+
 	@Override
-	public void saveReferService(ReferBean referbean,String r1) {
-		
-	// Chnages From Sravan
-	//	Refer refer=new Refer(); 
-	//	ReferenceIdUniqueNumber refernceId = new ReferenceIdUniqueNumber();
+	public ResponseEntity<?> saveReferService(ReferBean referbean, String r1) {
+		GenericResponse response = new GenericResponse();
+		// Chnages From Sravan
+		// Refer refer=new Refer();
+		// ReferenceIdUniqueNumber refernceId = new ReferenceIdUniqueNumber();
 		/*
 		 * refer.setReferenceId(r1);
 		 * refer.setBranchUserId(referbean.getBranchUserId());
@@ -50,13 +58,31 @@ public class ReferServiceImpl implements ReferService{
 		LOGGER.info("SaveReferService method is invoked in ReferServiceImpl class");
 		LOGGER.info(" Branch User Id "+referbean.getBranchUserId()+" Company Name "+referbean.getCompanyName()+" Country Name "+referbean.getCountryName()+" Email Address "+referbean.getEmailAddress()+" First Name "+referbean.getFirstName()+" Inserted By "+referbean.getInsertedBy()+" Last Name "+referbean.getLastName()+" Mobile No "+referbean.getMobileNo()+" Modified By "+referbean.getModifiedBy()+" Reference Id "+referbean.getReferenceId()+" Status "+referbean.getStatus()+" User Id "+referbean.getUserId());
 		ModelMapper modelMapper = new ModelMapper();
+		//NimaiEmailScheduler nem = new NimaiEmailScheduler();
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		Refer refer = modelMapper.map(referbean, Refer.class);
 		ReferenceIdUniqueNumber refernceId = new ReferenceIdUniqueNumber();
 		refer.setReferenceId(r1);
-		Refer r2=referRepo.save(refer);
+		int responseId=refer.getId();
+
+		// Changes By Shubham Patil
+		// Save the Data into Nimai Email Alert Schedular
+//		nem.setUserid(referbean.getUserId());
+//		nem.setEmailId(referbean.getEmailAddress());
+//		nem.setEmailStatus("pending");
+//		nem.setEvent("ADD_REFER");
+//		nem.setNimaiReferId(responseId);
+//		nem.setInsertedDate(Calendar.getInstance().getTime());
+//		nem = emailAlertRepository.save(nem);
+		// END
+
+		Refer r2 = referRepo.save(refer);
+
 		System.out.println(r2.getReferenceId());
-			
+
+		response.setData(refer);
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
+
 	}
 
 	@Override
@@ -102,19 +128,14 @@ public class ReferServiceImpl implements ReferService{
 		 * refer.setStatus(referbean.getStatus());
 		 * refer.setUserId(referbean.getUserId());
 		 */
-		 
-		  referRepo.getOne(referbean.getUserId());
+
+		referRepo.getOne(referbean.getUserId());
 		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		Refer refer = modelMapper.map(referbean, Refer.class);
-		
-		return	referRepo.save(refer);
-		
-				
-		
-				
-		
-		
+
+		return referRepo.save(refer);
+
 	}
 
 	@Override

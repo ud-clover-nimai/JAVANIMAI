@@ -1,6 +1,7 @@
 package com.nimai.ucm.service;
 
 import com.nimai.ucm.bean.BlackListedGoodsBean;
+
 import com.nimai.ucm.bean.BranchUserBean;
 import com.nimai.ucm.bean.BusinessDetailsBean;
 import com.nimai.ucm.bean.InterestedCountryBean;
@@ -14,6 +15,7 @@ import com.nimai.ucm.entity.OwnerMaster;
 public interface RegisterUserService {
 
 	public PersonalDetailsBean savePersonalDetails(PersonalDetailsBean personDetailsBean);
+
 
 	public PersonalDetailsBean updatePersonalDetails(PersonalDetailsBean personalDetails);
 

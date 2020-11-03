@@ -1,6 +1,7 @@
 package com.nimai.ucm.service;
 
 import java.util.Calendar;
+
 import java.util.Date;
 import java.util.List;
 
@@ -34,9 +35,9 @@ import com.nimai.ucm.utility.RegistrationId;
 @Transactional
 public class RegisterServiceImpl implements RegisterUserService {
 
-	//Chaanges from Sravan
+	// Chaanges from Sravan
 	private static final Logger LOGGER = LoggerFactory.getLogger(RegisterServiceImpl.class);
-	
+
 	@Autowired
 	RegistrationId userid;
 
@@ -45,6 +46,7 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Autowired
 	LoginRepository loginRepository;
+
 
 	@Autowired
 	PasswordGenerator password;
@@ -60,11 +62,20 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Override
 	public PersonalDetailsBean savePersonalDetails(PersonalDetailsBean personDetailsBean) {
-		//Changes from Sravan
+		// Changes from Sravan
 		LOGGER.info("savePersonalDetails methods is invoked in RegisterServiceImpl class");
-		LOGGER.info(" Bank Type "+personDetailsBean.getBankType()+" Business Type "+personDetailsBean.getBusinessType()+" Company Name "+personDetailsBean.getCompanyName()+" Country Name "+personDetailsBean.getCountryName()+" Designation "+personDetailsBean.getDesignation()+" Emai Address "+personDetailsBean.getEmailAddress()+" First Name "+personDetailsBean.getFirstName()+" Land Line Number"+personDetailsBean.getLandLinenumber()+" Last Name "+personDetailsBean.getLastName()+" Min LCValue "+personDetailsBean.getMinLCValue()+" Mobile Num "+personDetailsBean.getMobileNum()+" Subscriber Type "+personDetailsBean.getSubscriberType()+" User Id "+personDetailsBean.getUserId());
-		//End
+		LOGGER.info(" Bank Type " + personDetailsBean.getBankType() + " Business Type "
+				+ personDetailsBean.getBusinessType() + " Company Name " + personDetailsBean.getCompanyName()
+				+ " Country Name " + personDetailsBean.getCountryName() + " Designation "
+				+ personDetailsBean.getDesignation() + " Emai Address " + personDetailsBean.getEmailAddress()
+				+ " First Name " + personDetailsBean.getFirstName() + " Land Line Number"
+				+ personDetailsBean.getLandLinenumber() + " Last Name " + personDetailsBean.getLastName()
+				+ " Min LCValue " + personDetailsBean.getMinLCValue() + " Mobile Num "
+				+ personDetailsBean.getMobileNum() + " Subscriber Type " + personDetailsBean.getSubscriberType()
+				+ " User Id " + personDetailsBean.getUserId());
+		// End
 		NimaiCustomer nc = new NimaiCustomer();
+		// NimaiEmailScheduler nem = new NimaiEmailScheduler();
 
 		String subscriberType = personDetailsBean.getSubscriberType();
 		String bankType = "";
@@ -124,6 +135,18 @@ public class RegisterServiceImpl implements RegisterUserService {
 		nc.setInsertedDate(Calendar.getInstance().getTime());
 		nc.setModifiedDate(Calendar.getInstance().getTime());
 
+		// Setting value for email event Account_Activation and alert...
+		// Changes by Shubham Patil
+//		nem.setUserid(userID);
+//		nem.setEmailId(personDetailsBean.getEmailAddress());
+//		nem.setUserName(personDetailsBean.getFirstName());
+//		nem.setEmailStatus("pending");
+//		nem.setEvent("ACCOUNT_ACTIVATE");
+//		nem.setCustomerType(personDetailsBean.getSubscriberType());
+//		nem.setInsertedDate(Calendar.getInstance().getTime());
+//
+//		nem = emailAlertRepository.save(nem);
+
 		NimaiCustomer customerRegister = detailRepository.save(nc);
 
 		if (personDetailsBean.getSubscriberType().equalsIgnoreCase("BANK")) {
@@ -144,13 +167,13 @@ public class RegisterServiceImpl implements RegisterUserService {
 			}
 
 			for (InterestedCountryBean intCon : personDetailsBean.getInterestedCountry()) {
-				
-				if(intCon.getCountryID() == null) {
+
+				if (intCon.getCountryID() == null) {
 					InterestedCountry ic = new InterestedCountry();
 					ic.setCountryName(intCon.getCountriesIntrested());
 					ic.setInsertedDate(Calendar.getInstance().getTime());
 					ic.setUserId(nc);
-					ic.setCountryCurrencyId(intCon.getCcid());	
+					ic.setCountryCurrencyId(intCon.getCcid());
 					saveInterestedCountry(ic);
 				} else {
 					updateInterestedCountry(intCon);
@@ -190,9 +213,17 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Override
 	public boolean saveBusinessDetails(String userId, BusinessDetailsBean businessDetailsBean) {
-		//Changes from Sravan
+		// Changes from Sravan
 		LOGGER.info("saveBusinessDetails method is invoked in RegisterServiceImpl class");
-		LOGGER.info(" Address1 "+businessDetailsBean.getAddress1()+" Address2 "+businessDetailsBean.getAddress2()+" Address3 "+businessDetailsBean.getAddress3()+" Bank Name "+businessDetailsBean.getBankName()+" Branch Name "+businessDetailsBean.getBranchName()+" City "+businessDetailsBean.getCity()+" Company Name "+businessDetailsBean.getComapanyName()+" Designation "+businessDetailsBean.getDesignation()+" Pin Code "+businessDetailsBean.getPincode()+" Province Name "+businessDetailsBean.getProvinceName()+" Registered Country "+businessDetailsBean.getRegisteredCountry()+" Registration Type "+businessDetailsBean.getRegistrationType()+" Swift Code "+businessDetailsBean.getSwiftCode()+" Telephone "+businessDetailsBean.getTelephone()+" User Id "+businessDetailsBean.getUserId());
+		LOGGER.info(" Address1 " + businessDetailsBean.getAddress1() + " Address2 " + businessDetailsBean.getAddress2()
+				+ " Address3 " + businessDetailsBean.getAddress3() + " Bank Name " + businessDetailsBean.getBankName()
+				+ " Branch Name " + businessDetailsBean.getBranchName() + " City " + businessDetailsBean.getCity()
+				+ " Company Name " + businessDetailsBean.getComapanyName() + " Designation "
+				+ businessDetailsBean.getDesignation() + " Pin Code " + businessDetailsBean.getPincode()
+				+ " Province Name " + businessDetailsBean.getProvinceName() + " Registered Country "
+				+ businessDetailsBean.getRegisteredCountry() + " Registration Type "
+				+ businessDetailsBean.getRegistrationType() + " Swift Code " + businessDetailsBean.getSwiftCode()
+				+ " Telephone " + businessDetailsBean.getTelephone() + " User Id " + businessDetailsBean.getUserId());
 		NimaiCustomer nc = detailRepository.getOne(businessDetailsBean.getUserId());
 
 		if (nc != null) {
@@ -241,7 +272,6 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	}
 
-
 	@Override
 	public PersonalDetailsBean getPersonalDetails(String userId) {
 
@@ -274,8 +304,7 @@ public class RegisterServiceImpl implements RegisterUserService {
 		pdb.setEmailAddress1(nc.getEmailAddress1());
 		pdb.setEmailAddress2(nc.getEmailAddress2());
 		pdb.setEmailAddress3(nc.getEmailAddress3());
-		
-		
+
 		List<InterestedCountry> icbr = icr.findByUserId(nc);
 		InterestedCountryBean[] ibn = new InterestedCountryBean[icbr.size()];
 		int incre = 0;
@@ -318,7 +347,7 @@ public class RegisterServiceImpl implements RegisterUserService {
 		bdb.setBranchName(nc.getBranchName());
 		bdb.setSwiftCode(nc.getSwiftCode());
 		bdb.setDesignation(nc.getDesignation());
-		
+
 		bdb.setComapanyName(nc.getCompanyName());
 		bdb.setRegistrationType(nc.getRegistrationType());
 
@@ -334,8 +363,7 @@ public class RegisterServiceImpl implements RegisterUserService {
 		bdb.setPincode(nc.getPincode());
 		bdb.setOwnerMasterBean(new OwnerMasterBean[] {});
 		bdb.setIsBDetailsFilled(nc.getIsBDetailsFilled());
-		
-		
+
 		List<OwnerMaster> owners = omr.findByUserId(nc);
 
 		if (!owners.isEmpty()) {
@@ -358,25 +386,25 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Override
 	public boolean checkEmailId(String emailId) {
-		//Changes from Sravan
+		// Changes from Sravan
 		LOGGER.info("checkEmailID method is invoked in RegisterServiceImpl class");
-		LOGGER.info("Email Id"+emailId);
+		LOGGER.info("Email Id" + emailId);
 		return detailRepository.existsByEmailAddress(emailId);
 	}
 
 	@Override
 	public boolean checkUserId(String userId) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("checkUserID method is invoked in RegisterServiceImpl class");
-		LOGGER.info("User Id"+userId);
+		LOGGER.info("User Id" + userId);
 		return detailRepository.existsById(userId);
 	}
 
 	@Override
 	public NimaiMLogin saveUserCredentials(NimaiMLogin loginEntity) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("SaveUserCredentials method is invoked in RegisterServiceImpl class");
-		LOGGER.info("loginEntity "+loginEntity);
+		LOGGER.info("loginEntity " + loginEntity);
 		return loginRepository.save(loginEntity);
 	}
 
@@ -388,9 +416,14 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Override
 	public PersonalDetailsBean updatePersonalDetails(PersonalDetailsBean pdb) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("updatePersonalDetails method is invoked in RegisterServiceImpl class");
-		LOGGER.info(" Bank Type "+pdb.getBankType()+" Business Type "+pdb.getBusinessType()+" Company Name "+pdb.getCompanyName()+" Country Name "+pdb.getCountryName()+" Designation "+pdb.getDesignation()+" Email Address "+pdb.getEmailAddress()+" First Name "+pdb.getFirstName()+" Land Line Number "+pdb.getLandLinenumber()+" LastName "+pdb.getLastName()+" MinLCVlue "+pdb.getMinLCValue()+" Mobile Num "+pdb.getMobileNum()+" Subscriber Type "+pdb.getSubscriberType()+" User Id "+pdb.getUserId());
+		LOGGER.info(" Bank Type " + pdb.getBankType() + " Business Type " + pdb.getBusinessType() + " Company Name "
+				+ pdb.getCompanyName() + " Country Name " + pdb.getCountryName() + " Designation "
+				+ pdb.getDesignation() + " Email Address " + pdb.getEmailAddress() + " First Name " + pdb.getFirstName()
+				+ " Land Line Number " + pdb.getLandLinenumber() + " LastName " + pdb.getLastName() + " MinLCVlue "
+				+ pdb.getMinLCValue() + " Mobile Num " + pdb.getMobileNum() + " Subscriber Type "
+				+ pdb.getSubscriberType() + " User Id " + pdb.getUserId());
 		NimaiCustomer nc = detailRepository.getOne(pdb.getUserId());
 
 		nc.setFirstName(pdb.getFirstName());
@@ -404,11 +437,11 @@ public class RegisterServiceImpl implements RegisterUserService {
 		nc.setBusinessType(pdb.getBusinessType());
 
 		nc.setMinValueofLc(pdb.getMinLCValue());
-		
+
 		nc.setEmailAddress1(pdb.getEmailAddress1());
 		nc.setEmailAddress2(pdb.getEmailAddress2());
 		nc.setEmailAddress3(pdb.getEmailAddress3());
-		
+
 		// Need to add Countries Interested and Blacklisted Goods
 
 		nc = detailRepository.save(nc);
@@ -421,7 +454,7 @@ public class RegisterServiceImpl implements RegisterUserService {
 		pdb.setCountryName(nc.getCountryName());
 		pdb.setCompanyName(nc.getCompanyName());
 		pdb.setBusinessType(nc.getBusinessType());
-		
+
 		pdb.setEmailAddress1(nc.getEmailAddress1());
 		pdb.setEmailAddress2(nc.getEmailAddress2());
 		pdb.setEmailAddress3(nc.getEmailAddress3());
@@ -430,7 +463,7 @@ public class RegisterServiceImpl implements RegisterUserService {
 		pdb.setSubscriberType(nc.getSubscriberType());
 
 		if (nc.getSubscriberType().equalsIgnoreCase("BANK") && nc.getBankType().equalsIgnoreCase("Underwriter")) {
-			
+
 			blgr.deleteBlackListedGoodsUserId(nc.getUserid());
 			for (BlackListedGoodsBean blgBean : pdb.getBlacklistedGoods()) {
 				if (blgBean.getGoods_ID() == null) {
@@ -444,7 +477,7 @@ public class RegisterServiceImpl implements RegisterUserService {
 				}
 
 			}
-			
+
 			icr.deleteInterestedCountryUserId(nc.getUserid());
 			for (InterestedCountryBean intCon : pdb.getInterestedCountry()) {
 				if (intCon.getCountryID() == null) {
@@ -465,25 +498,29 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Override
 	public void saveInterestedCountry(InterestedCountry ic) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("Save Interested Country method is invoked in RegisterServiceImpl class");
-		LOGGER.info(" Country Name "+ic.getCountryName()+" Country Currency Id "+ic.getCountryCurrencyId()+" Country Id "+ic.getCountryID()+" Inserted Date "+ic.getInsertedDate()+" Modified Date "+ic.getModifiedDate()+" User Id "+ic.getUserId());
+		LOGGER.info(" Country Name " + ic.getCountryName() + " Country Currency Id " + ic.getCountryCurrencyId()
+				+ " Country Id " + ic.getCountryID() + " Inserted Date " + ic.getInsertedDate() + " Modified Date "
+				+ ic.getModifiedDate() + " User Id " + ic.getUserId());
 		icr.save(ic);
 	}
 
 	@Override
 	public void saveBlackListedGoods(BlackListedGoods blg) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("Save Black Listed Goods method is invoked in RegisterServiceImpl class");
-		LOGGER.info(" Goods Name "+blg.getGoodsName()+" Goods ID "+blg.getGoods_ID()+" GoodsMId "+blg.getGoodsMId()+" Inserted Date "+blg.getInsertedDate()+" Modified Date "+blg.getModifiedDate()+" User Id "+blg.getUserId());
+		LOGGER.info(" Goods Name " + blg.getGoodsName() + " Goods ID " + blg.getGoods_ID() + " GoodsMId "
+				+ blg.getGoodsMId() + " Inserted Date " + blg.getInsertedDate() + " Modified Date "
+				+ blg.getModifiedDate() + " User Id " + blg.getUserId());
 		blgr.save(blg);
 	}
 
 	@Override
 	public void updateInterestedCountry(InterestedCountryBean icb) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("Update Interested Country method is invoked in RegisterServiceImpl class");
-		LOGGER.info(" Ccid "+icb.getCcid()+" Country Id "+icb.getCountryID());
+		LOGGER.info(" Ccid " + icb.getCcid() + " Country Id " + icb.getCountryID());
 		InterestedCountry ic = icr.getOne(icb.getCountryID());
 		if (ic != null) {
 			ic.setCountryName(icb.getCountriesIntrested());
@@ -496,9 +533,10 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Override
 	public void updateBlackListedGoods(BlackListedGoodsBean blgb) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("Update Black Listed Goods method is invoked in RegisterServiceImpl class");
-		LOGGER.info(" Black List Goods "+blgb.getBlackListGoods()+" Goods ID "+blgb.getGoods_ID()+" Goods MId "+blgb.getGoodsMId());
+		LOGGER.info(" Black List Goods " + blgb.getBlackListGoods() + " Goods ID " + blgb.getGoods_ID() + " Goods MId "
+				+ blgb.getGoodsMId());
 		BlackListedGoods blg = blgr.getOne(blgb.getGoods_ID());
 		if (blg != null) {
 			blg.setGoodsName(blgb.getBlackListGoods());
@@ -511,17 +549,20 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Override
 	public void saveOwnerMaster(OwnerMaster om) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("saveOwnerMaster method is invoked in RegisterServiceimpl Class");
-		LOGGER.info(" Designation "+om.getDesignation()+" Owner First Name "+om.getOwnerFirstName()+" Owner Last Name "+om.getOwnerLastName()+" Owner ID "+om.getOwnerID()+" Inserted Date "+om.getInsertedDate()+" Modified Date "+om.getModifiedDate()+" User Id "+om.getUserId());
+		LOGGER.info(" Designation " + om.getDesignation() + " Owner First Name " + om.getOwnerFirstName()
+				+ " Owner Last Name " + om.getOwnerLastName() + " Owner ID " + om.getOwnerID() + " Inserted Date "
+				+ om.getInsertedDate() + " Modified Date " + om.getModifiedDate() + " User Id " + om.getUserId());
 		omr.save(om);
 	}
 
 	@Override
 	public void updateOwnerMaster(OwnerMasterBean om) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("saveOwnerMaster method is invoked in RegisterServiceimpl Class");
-		LOGGER.info(" Designation "+om.getDesignation()+" Owner First Name "+om.getOwnerFirstName()+" Owner Last Name "+om.getOwnerLastName()+" Owner ID "+om.getOwnerID());
+		LOGGER.info(" Designation " + om.getDesignation() + " Owner First Name " + om.getOwnerFirstName()
+				+ " Owner Last Name " + om.getOwnerLastName() + " Owner ID " + om.getOwnerID());
 		OwnerMaster omm = omr.getOne(om.getOwnerID());
 		if (omm != null) {
 			omm.setDesignation(om.getDesignation());
@@ -541,10 +582,15 @@ public class RegisterServiceImpl implements RegisterUserService {
 
 	@Override
 	public BranchUserBean saveBranchUser(BranchUserBean branchUserbean) {
-		//Changes From Sravan
+		// Changes From Sravan
 		LOGGER.info("Save Branch User method is invoked");
-		LOGGER.info(" Branch Id "+branchUserbean.getBranchId()+" Email Id "+branchUserbean.getEmailId()+" Employee Id "+branchUserbean.getEmployeeId()+" Inserted By "+branchUserbean.getInsertedBy()+" Inserted Date "+branchUserbean.getInsertedDate()+" Modified By "+branchUserbean.getModifiedBy()+" Modified Date "+branchUserbean.getModifiedDate()+" Passcode Value "+branchUserbean.getPasscodeValue()+" Token Id "+branchUserbean.getTokenId()+" User Id "+branchUserbean.getUserID());
-		BranchUser nimaipwd= new BranchUser();
+		LOGGER.info(" Branch Id " + branchUserbean.getBranchId() + " Email Id " + branchUserbean.getEmailId()
+				+ " Employee Id " + branchUserbean.getEmployeeId() + " Inserted By " + branchUserbean.getInsertedBy()
+				+ " Inserted Date " + branchUserbean.getInsertedDate() + " Modified By "
+				+ branchUserbean.getModifiedBy() + " Modified Date " + branchUserbean.getModifiedDate()
+				+ " Passcode Value " + branchUserbean.getPasscodeValue() + " Token Id " + branchUserbean.getTokenId()
+				+ " User Id " + branchUserbean.getUserID());
+		BranchUser nimaipwd = new BranchUser();
 		nimaipwd.setBranchId(branchUserbean.getBranchId());
 		nimaipwd.setEmailId(branchUserbean.getEmailId());
 		nimaipwd.setEmployeeId(branchUserbean.getEmployeeId());
@@ -560,4 +606,5 @@ public class RegisterServiceImpl implements RegisterUserService {
 //		nimaipedrepo.save(nimaipwd);
 		return branchUserbean;
 	}
+
 }

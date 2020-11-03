@@ -39,11 +39,9 @@ public class UserDetailController {
 
 	@Autowired
 	RegistrationId register;
-	
+
 	@Autowired
 	CountryService countryService;
-
-	
 
 	/*----------------- Method For Personal Details ---------------------*/
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -218,19 +216,17 @@ public class UserDetailController {
 		}
 	}
 
-	
 	/*---------------------- Branch User Details -----------------------*/
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/saveBranchUser", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-	public ResponseEntity<Object> generatePassword(@RequestBody BranchUserBean branchUserbean)
-	{
+	public ResponseEntity<Object> generatePassword(@RequestBody BranchUserBean branchUserbean) {
 		GenericResponse<Object> response = new GenericResponse<Object>();
-		
+
 		registerUser.saveBranchUser(branchUserbean);
-		
+
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
-		
-    }
+
+	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/viewDetailedCountry", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)

@@ -180,7 +180,8 @@ public class ValidateUserDetails {
 		final Pattern DESIGNATION = Pattern.compile("^[a-zA-Z]*$");
 		final Pattern OFFCADDRESS = Pattern.compile("\"([^\\\\\"]|\\\\\")*\"");
 		final Pattern OFFCNUMBER = Pattern.compile("^[0-9]*$");
-		final Pattern OWNERNAME = Pattern.compile("^[a-zA-Z]*$");
+	//	final Pattern OWNERNAME = Pattern.compile("^[a-zA-Z]*$");
+		final Pattern OWNERNAME = Pattern.compile("^\\pL+[\\pL\\pZ\\pP]{0,}$" );
 		final Pattern REGISTRATIONTYPE = Pattern.compile("^[a-zA-Z]*$");
 		final Pattern TELEPHONE = Pattern.compile("^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$");
 		final Pattern Alphanumeric = Pattern.compile("^[a-zA-Z0-9@]*$");
