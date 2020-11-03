@@ -1,17 +1,24 @@
 package com.nimai.email.dao;
 
+import java.util.ArrayList;
+
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import com.nimai.email.entity.NimaiClient;
+import com.nimai.email.entity.NimaiEmailScheduler;
+import com.nimai.email.entity.NimaiEmailSchedulerAlertToBanks;
 import com.nimai.email.entity.NimaiFSubsidiaries;
 import com.nimai.email.entity.NimaiLC;
 import com.nimai.email.entity.NimaiMBranch;
@@ -21,6 +28,8 @@ import com.nimai.email.entity.NimaiMRefer;
 @Repository
 @Transactional
 public class UserServiceDaoImpl implements UserServiceDao {
+
+	private static Logger logger = LoggerFactory.getLogger(UserServiceDaoImpl.class);
 
 	@Autowired
 	SessionFactory sessionFactory;
@@ -340,4 +349,160 @@ public class UserServiceDaoImpl implements UserServiceDao {
 		return results;
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<NimaiEmailScheduler> getSchedulerDetails() {
+		// TODO Auto-generated method stub
+		logger.info("inside save getTransactionDetail method of UserServiceDaoImpl class");
+		List<NimaiEmailScheduler> emailDetailsScheduled = new ArrayList<>();
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery("from NimaiEmailScheduler nb where nb.emailStatus = :emailStatus");
+			query.setParameter("emailStatus", "pending");
+			emailDetailsScheduled = query.getResultList();
+			return emailDetailsScheduled;
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+			return null;
+		}
+	}
+
+	@Override
+	@Transactional(dontRollbackOn = Exception.class)
+	public void updateEmailStatus(int scedulerid) {
+		// TODO Auto-generated method stub
+		logger.info("inside save updateEmailTransactionDetail method of UserServiceDaoImpl class");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			NimaiEmailScheduler email = (NimaiEmailScheduler) session.load(NimaiEmailScheduler.class,
+					new Integer(scedulerid));
+			if (null != email) {
+				email.setEmailStatus("Sent");
+				session.update(email);
+			}
+
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public void updateReferTokenDetails(Date tokenExpiry, String refertokenKey, NimaiClient clientUseId,
+			Date insertedDate, String emailId, int referenceId) {
+		// TODO Auto-generated method stub
+
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			NimaiMRefer refer = (NimaiMRefer) session.load(NimaiMRefer.class, new Integer(referenceId));
+			if (null != refer) {
+				refer.setTokenExpiryTime(tokenExpiry);
+				refer.setToken(refertokenKey);
+				refer.setUserid(clientUseId);
+				refer.setTokenInsertedDate(insertedDate);
+				refer.setEmailAddress(emailId);
+				session.update(refer);
+			}
+
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public NimaiMRefer getreferDetails(int referenceId) {
+		NimaiMRefer result = null;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery("From NimaiMRefer b WHERE b.id=:referenceId");
+			query.setParameter("referenceId", referenceId);
+			query.setMaxResults(1);
+			result = (NimaiMRefer) query.getSingleResult();
+		} catch (NoResultException re) {
+			return null;
+		}
+		return result;
+	}
+
+	@Override
+	public NimaiMBranch getBranchUserbyUserId(String userid) {
+		NimaiMBranch results = null;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery("from NimaiMBranch n where n.userid = :userid ", NimaiMBranch.class);
+			query.setParameter("userid", userid);
+			results = (NimaiMBranch) query.getSingleResult();
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+			return null;
+		}
+
+		return results;
+
+	}
+
+	@Override
+	public void updateEmailStatus(String userid) {
+		Session session = null;
+		boolean newSession = false;
+		try {
+			session = sessionFactory.getCurrentSession();
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+			getSessionFactory().openSession();
+			newSession = true;
+
+		}
+		Query query = session
+				.createQuery("UPDATE NimaiEmailScheduler nb set nb.emailStatus= :emailStatus where nb.userid= :userid");
+		query.setParameter("emailStatus", "sent");
+		query.setParameter("userid", userid);
+		query.executeUpdate();
+		if (newSession)
+			session.close();
+
+	}
+
+	@Override
+	public void updateLoginEmailStatus(String userid) {
+		// TODO Auto-generated method stub
+		Session session = null;
+		boolean newSession = false;
+		try {
+			session = sessionFactory.getCurrentSession();
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+			getSessionFactory().openSession();
+			newSession = true;
+
+		}
+		Query query = session
+				.createQuery("UPDATE NimaiMLogin nb set nb.emailStatus= :emailStatus where nb.userid.userid= :userid");
+		query.setParameter("emailStatus", "sent");
+		query.setParameter("userid", userid);
+		query.executeUpdate();
+		if (newSession)
+			session.close();
+
+	}
+
+	@Override
+	public List<NimaiLC> getCustTransactionList(Date todaysDate) {
+		// TODO Auto-generated method stub
+		List<NimaiLC> results = null;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			String hql = "from NimaiLC where insertedDate > :date";
+			Query query = session.createQuery(hql);
+			query.setParameter("date", todaysDate);
+			results = query.getResultList();
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+			return null;
+		}
+
+		return results;
+
+	}
 }

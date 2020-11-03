@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,8 +53,8 @@ public class EmailContentProcessImpl {
 			System.out.println("@#####input.get(1)= " + input.get(1));
 			System.out.println("@#####input.get(2)= " + input.get(2));
 			System.out.println("@#####input.get(3)= " + input.get(3));
-			// System.out.println("@#####input.get(4)= "+input.get(4));
-//                  System.out.println("@#####input.get(5)= "+input.get(5));
+			System.out.println("@#####input.get(4)= " + input.get(4));
+			// System.out.println("@#####input.get(5)= "+input.get(5));
 //                  System.out.println("@#####input.get(6)= "+input.get(6));
 
 			// EmailCompMapHandler hEmailComponent=EmailCompMapHandler.getInstance();
@@ -115,15 +116,19 @@ public class EmailContentProcessImpl {
 //                javaCodeImage = "" + javaCodeImage +","+ emailConfigurationBean.getInlineimage();
 //                output.add(javaCodeImage);
 //                //output.add(emailConfigurationBean.getBodyencrypt());
-//                output.add(getTotalAttachementList(emailConfigurationBean,(ArrayList)input.get(4)));
-
+			if (input.get(4) != null) {
+				output.add(getTotalAttachementList(emailConfigurationBean, (ArrayList) input.get(4)));
+			} else {
+				output.add(null);
+			}
 			/*
-			 * try{ System.out.println("insideeeeeeee:input.size()="+input.size());
-			 * if(input.size() >=5){ System.out.println("===="+input.get(4));
+			 * try { System.out.println("insideeeeeeee:input.size()=" + input.size()); if
+			 * (input.size() >= 5) { System.out.println("====" + input.get(4));
 			 * output.add(input.get(4));
 			 * 
-			 * } }catch(Exception e){ e.printStackTrace(System.out); }
+			 * } } catch (Exception e) { e.printStackTrace(System.out); }
 			 */
+
 		}
 
 		return output;
@@ -212,45 +217,107 @@ public class EmailContentProcessImpl {
 		System.out.println(str);
 		System.out.println("--------------------------------------");
 		Set<String> keys = hm.keySet();
-		Iterator<String> itr = keys.iterator();
-		while (itr.hasNext()) {
-			String key = itr.next();
+
+		for (String key : keys) {
+
 			String value = (String) hm.get(key);
+
 			if (key.equalsIgnoreCase("username") && str.contains("${username}")) {
-				str = str.replace("${" + key + "}", value);
+				str = value != null ? str.replace("${" + key + "}", value) : str.replace("${" + key + "}", value = "");
 			} else if (key.equalsIgnoreCase("userId") && str.contains("${userId}")) {
-				str = str.replace("${" + key + "}", value);
+				// str = str.replace("${" + key + "}", value);
+				str = value != null ? str.replace("${" + key + "}", value) : str.replace("${" + key + "}", value = "");
 			} else if (key.equalsIgnoreCase("link") && str.contains("${link}")) {
-				str = str.replace("${" + key + "}", value);
+				str = value != null ? str.replace("${" + key + "}", value) : str.replace("${" + key + "}", value = "");
+				// str = str.replace("${" + key + "}", value);
 			} else if (key.equalsIgnoreCase("passcode") && str.contains("${passcode}")) {
-				str = str.replace("${" + key + "}", value);
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
 			} else if (key.equalsIgnoreCase("transactionId") && str.contains("${transactionId}")) {
-				str = str.replace("${" + key + "}", value);
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
 			} else if (key.equalsIgnoreCase("quotationId") && str.contains("${quotationId}")) {
-				str = str.replace("${" + key + "}", value);
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
 			} else if (key.equalsIgnoreCase("reason") && str.contains("${reason}")) {
-				str = str.replace("${" + key + "}", value);
-			} 
-			else if (key.equalsIgnoreCase("username") && str.contains("${username}")) {
-				str = str.replace("${" + key + "}", value);
-			}else if (key.equalsIgnoreCase("lcIssuingValue") && str.contains("${lcIssuingValue}")) {
-				str = str.replace("${" + key + "}", value);
-			}else if (key.equalsIgnoreCase("lcIssuingDate") && str.contains("${lcIssuingDate}")) {
-				str = str.replace("${" + key + "}", value);
-			}else if (key.equalsIgnoreCase("lcExpiryDate") && str.contains("${lcExpiryDate}")) {
-				str = str.replace("${" + key + "}", value);
-			}
-			else if (key.equalsIgnoreCase("customerName") && str.contains("${customerName}")) {
-				str = str.replace("${" + key + "}", value);
-			}
-			else if (key.equalsIgnoreCase("totalQuoteValue") && str.contains("${totalQuoteValue}")) {
-				str = str.replace("${" + key + "}", value);
-			}
-			else if (key.equalsIgnoreCase("validatyDate") && str.contains("${validatyDate}")) {
-				str = str.replace("${" + key + "}", value);
-			}
-			else
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("username") && str.contains("${username}")) {
+				str = value != null ? str.replace("${" + key + "}", value) : str.replace("${" + key + "}", value = "");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("lcIssuingValue") && str.contains("${lcIssuingValue}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("lcIssuingDate") && str.contains("${lcIssuingDate}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("lcExpiryDate") && str.contains("${lcExpiryDate}")) {
+				// str = str.replace("${" + key + "}", value);
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+			} else if (key.equalsIgnoreCase("customerName") && str.contains("${customerName}")) {
+				str = value != null ? str.replace("${" + key + "}", value) : str.replace("${" + key + "}", value = "");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("totalQuoteValue") && str.contains("${totalQuoteValue}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("validatyDate") && str.contains("${validatyDate}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("htmlBody") && str.contains("${htmlBody}")) {
+				str = value != null ? str.replace("${" + key + "}", value) : str.replace("${" + key + "}", value = " ");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("branchName") && str.contains("${branchName}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("bankName") && str.contains("${bankName}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("suscriptionId") && str.contains("${suscriptionId}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("subscriptionName") && str.contains("${subscriptionName}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("relationshipManager") && str.contains("${relationshipManager}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("customerSupport") && str.contains("${customerSupport}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("splanStartDate") && str.contains("${splanStartDate}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("splanEndDate") && str.contains("${splanEndDate}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("splanValidity") && str.contains("${splanValidity}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else if (key.equalsIgnoreCase("splanAmount") && str.contains("${splanAmount}")) {
+				str = value != null ? str.replace("${" + key + "}", value)
+						: str.replace("${" + key + "}", value = "NA");
+				// str = str.replace("${" + key + "}", value);
+			} else
 				str = str.replaceAll("\\$" + key + "\\$", value);
+
 		}
 
 		System.out.println("body=" + str);
@@ -261,9 +328,10 @@ public class EmailContentProcessImpl {
 	private static String replaceAll1(HashMap hm, String str) {
 
 		Set<String> keys = hm.keySet();
-		Iterator<String> itr = keys.iterator();
-		while (itr.hasNext()) {
-			String key = itr.next();
+		// Iterator<String> itr = keys.iterator();
+		for (String key : keys) {
+			// while (itr.hasNext()) {
+			// String key = itr.next();
 			String value = (String) hm.get(key);
 			str = str.replaceAll("\\$" + key + "\\$", value);
 		}

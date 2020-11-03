@@ -4,10 +4,25 @@ public class SubsidiaryBean {
 	private String emailId;
 	private String userId;
 	private String event;
+	private int referenceId;
 	
 	
 	
 	
+	
+
+	/**
+	 * @return the referenceId
+	 */
+	public int getReferenceId() {
+		return referenceId;
+	}
+	/**
+	 * @param referenceId the referenceId to set
+	 */
+	public void setReferenceId(int referenceId) {
+		this.referenceId = referenceId;
+	}
 	public String getEmailId() {
 		return emailId;
 	}

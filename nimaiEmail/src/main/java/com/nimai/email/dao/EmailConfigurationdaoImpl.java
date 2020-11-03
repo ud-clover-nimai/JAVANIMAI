@@ -1,5 +1,7 @@
 package com.nimai.email.dao;
 
+import javax.persistence.NoResultException;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nimai.email.entity.EmailComponentMaster;
+import com.nimai.email.entity.NimaiEmailSchedulerAlertToBanks;
 
 @Repository
 @Transactional
@@ -74,6 +77,28 @@ public class EmailConfigurationdaoImpl {
         }
         return emailComponentmaster;
     }
+
+	public EmailComponentMaster saveCCEmails(String emailAddress1, String emailAddress2, String emailAddress3) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void saveCCEmails(String ccEmails,int eventId) {
+		// TODO Auto-generated method stub
+		logger.info("inside save updateEmailStatus method of BanksAlertDaoImpl class");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			EmailComponentMaster email = (EmailComponentMaster) session
+					.load(EmailComponentMaster.class, new Integer(eventId));
+			if (null != email) {
+				email.setCc(ccEmails);;
+				session.update(email);
+			}
+
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+		}
+	}
 
 
 }

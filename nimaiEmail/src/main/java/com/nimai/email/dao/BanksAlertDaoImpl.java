@@ -43,13 +43,14 @@ public class BanksAlertDaoImpl implements BanksAlertDao {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<NimaiEmailSchedulerAlertToBanks> getTransactionDetail() {
-		// TODO Auto-generated method stub
 		logger.info("inside save getTransactionDetail method of BanksAlertDaoImpl class");
 		List<NimaiEmailSchedulerAlertToBanks> emailDetailsScheduled = new ArrayList<>();
 		try {
 			Session session = sessionFactory.getCurrentSession();
-			Query query = session.createQuery("from NimaiEmailSchedulerAlertToBanks");
+			Query query = session.createQuery("from NimaiEmailSchedulerAlertToBanks nb where nb.emailFlag = :emailFlag");
+			query.setParameter("emailFlag", "pending");
 			emailDetailsScheduled = query.getResultList();
 			return emailDetailsScheduled;
 		} catch (NoResultException nre) {
@@ -76,7 +77,25 @@ public class BanksAlertDaoImpl implements BanksAlertDao {
 	}
 
 	@Override
-	public NimaiLC getTransactioDetailsByTransIs(String transactionid) {
+	public void updateEmailFlag(int scedulerid) {
+		// TODO Auto-generated method stub
+		logger.info("inside save updateEmailFlag method of BanksAlertDaoImpl class");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			NimaiEmailSchedulerAlertToBanks email = (NimaiEmailSchedulerAlertToBanks) session
+					.load(NimaiEmailSchedulerAlertToBanks.class, new Integer(scedulerid));
+			if (null != email) {
+				email.setEmailFlag("sent");
+				session.update(email);
+			}
+
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+		}
+	}
+
+	@Override
+	public NimaiLC getTransactioDetailsByTransId(String transactionid) {
 		logger.info("inside save getTransactioDetailsByTransIs method of BanksAlertDaoImpl class");
 		NimaiLC results = null;
 		try {
@@ -126,6 +145,75 @@ public class BanksAlertDaoImpl implements BanksAlertDao {
 		}
 
 		return results; 
+	}
+
+	@Override
+	public List<NimaiEmailSchedulerAlertToBanks> getTransactionDetailByTrEmailStatus() {
+		List<NimaiEmailSchedulerAlertToBanks> emailDetailsScheduled = new ArrayList<>();
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session
+					.createQuery("from NimaiEmailSchedulerAlertToBanks nb where nb.transactionEmailStatusToBanks = :emailFlag");
+			query.setParameter("emailFlag", "pending");
+			emailDetailsScheduled = query.getResultList();
+			return emailDetailsScheduled;
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+			return null;
+		}
+	}
+
+	@Override
+	public void updateTrStatusEmailFlag(int schedulerId) {
+		logger.info("inside save updateTrStatusEmailFlag method of BanksAlertDaoImpl class");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			NimaiEmailSchedulerAlertToBanks email = (NimaiEmailSchedulerAlertToBanks) session
+					.load(NimaiEmailSchedulerAlertToBanks.class, new Integer(schedulerId));
+			if (null != email) {
+				email.setTransactionEmailStatusToBanks("sent");
+				session.update(email);
+			}
+
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+		}	
+	}
+
+	@Override
+	public void updateTREmailStatus(int scedulerid) {
+		// TODO Auto-generated method stub
+		logger.info("inside save updateTREmailStatus method of BanksAlertDaoImpl class");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			NimaiEmailSchedulerAlertToBanks email = (NimaiEmailSchedulerAlertToBanks) session
+					.load(NimaiEmailSchedulerAlertToBanks.class, new Integer(scedulerid));
+			if (null != email) {
+				email.setTransactionEmailStatusToBanks("In-Process");
+				session.update(email);
+			}
+
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+		}
+	}
+
+	@Override
+	public void updateBankEmailFlag(int scedulerid) {
+		// TODO Auto-generated method stub
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			NimaiEmailSchedulerAlertToBanks email = (NimaiEmailSchedulerAlertToBanks) session
+					.load(NimaiEmailSchedulerAlertToBanks.class, new Integer(scedulerid));
+			if (null != email) {
+				email.setEmailFlag("sent");
+				email.setTransactionEmailStatusToBanks("sent");
+				session.update(email);
+			}
+
+		} catch (NoResultException nre) {
+			nre.printStackTrace();
+		}
 	}
 
 }

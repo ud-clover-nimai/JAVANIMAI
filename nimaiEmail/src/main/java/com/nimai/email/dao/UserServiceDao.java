@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.nimai.email.entity.NimaiClient;
+import com.nimai.email.entity.NimaiEmailScheduler;
 import com.nimai.email.entity.NimaiEmailSchedulerAlertToBanks;
 import com.nimai.email.entity.NimaiFSubsidiaries;
 import com.nimai.email.entity.NimaiLC;
@@ -32,6 +33,15 @@ NimaiMBranch updateBranchUserDetails(String emailID, Date dnow, String passcodeV
 NimaiMBranch updateBranchUser(String passcode, String tokenKey, Date insertedDate, String emailId, int id, Date tokenExpiry);
 boolean isEntryPresent(int id);
 NimaiLC getTransactioDetailsByTransIs(String transactionid);
+List<NimaiEmailScheduler> getSchedulerDetails();
+void updateEmailStatus(int scedulerid);
+void updateReferTokenDetails(Date tokenExpiry, String refertokenKey, NimaiClient clientUseId, Date insertedDate,
+		String emailId,int referenceId);
+NimaiMRefer getreferDetails(int referenceId);
+NimaiMBranch getBranchUserbyUserId(String userid);
+void updateEmailStatus(String userid);
+void updateLoginEmailStatus(String userid);
+List<NimaiLC> getCustTransactionList(Date todaysDate);
 
 
 }

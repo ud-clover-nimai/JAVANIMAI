@@ -1,5 +1,6 @@
 package com.nimai.email.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.nimai.email.api.GenericResponse;
@@ -54,20 +56,17 @@ public class BanksAlertEmailServiceImpl implements BanksALertEmailService {
 	@Autowired
 	ResetUserValidation resetUserValidator;
 
-	@Override
-	public ResponseEntity<?> getAlleligibleBAnksEmail(AlertToBanksBean alertBanksBean) {
-		GenericResponse response = new GenericResponse();
-		logger.info("=======getAlleligibleBAnksEmail method invoked===========");
-
-		String errorString = this.resetUserValidator.banksEmailValidation(alertBanksBean,
-				alertBanksBean.getBankEmail());
-		if (errorString.equalsIgnoreCase("Success")) {
-			/*
-			 * while passing upload and update alert front end should complusary provide
-			 * customerUserId and transactionId
-			 */
-			if (alertBanksBean.getEvent().equalsIgnoreCase("LC_UPLOAD_ALERT_ToBanks")
-					|| alertBanksBean.getEvent().equalsIgnoreCase("LC_UPDATE_ALERT_ToBanks")) {
+	@Scheduled(fixedDelay = 50000)
+	public void setTransactionEmailInSchTable() {
+		logger.info("============Inside scheduler method of setTransactionEmailInSchTable==============");
+		/* query to fetch the list of data from nimaiEmailAlertsTobankSchedulerTablw */
+		List<NimaiEmailSchedulerAlertToBanks> emailDetailsScheduled = userDao.getTransactionDetailByTrEmailStatus();
+		Iterator itr = emailDetailsScheduled.iterator();
+		while (itr.hasNext()) {
+			NimaiEmailSchedulerAlertToBanks schdulerData = (NimaiEmailSchedulerAlertToBanks) itr.next();
+			if (schdulerData.getTransactionEmailStatusToBanks().equalsIgnoreCase("pending")
+					&& schdulerData.getCustomerid().substring(0, 2).equalsIgnoreCase("CU")
+					&& schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPLOAD(DATA)")) {
 				try {
 					StoredProcedureQuery getBAnksEmail = em.createEntityManager()
 							.createStoredProcedureQuery("get_eligible_banks", NimaiClient.class);
@@ -76,12 +75,13 @@ public class BanksAlertEmailServiceImpl implements BanksALertEmailService {
 					getBAnksEmail.registerStoredProcedureParameter("inp_transaction_ID", String.class,
 							ParameterMode.IN);
 
-					getBAnksEmail.setParameter("inp_customer_userID", alertBanksBean.getCustomerUserId());
-					getBAnksEmail.setParameter("inp_transaction_ID", alertBanksBean.getTransactionId());
+					getBAnksEmail.setParameter("inp_customer_userID", schdulerData.getCustomerid());
+					getBAnksEmail.setParameter("inp_transaction_ID", schdulerData.getTransactionid());
 					getBAnksEmail.execute();
 					ModelMapper modelMapper = new ModelMapper();
 					List<NimaiClient> nimaiCust = getBAnksEmail.getResultList();
 					EligibleEmailBeanResponse responseBean = new EligibleEmailBeanResponse();
+					List<EligibleEmailList> emailIdList = new ArrayList<EligibleEmailList>();
 
 					List<EligibleEmailList> emailId = nimaiCust.stream().map(obj -> {
 						EligibleEmailList data = new EligibleEmailList();
@@ -89,86 +89,137 @@ public class BanksAlertEmailServiceImpl implements BanksALertEmailService {
 						Calendar cal = Calendar.getInstance();
 						Date insertedDate = cal.getTime();
 						schedulerEntity.setInsertedDate(insertedDate);
-						schedulerEntity.setCustomerid(alertBanksBean.getCustomerUserId());
-						schedulerEntity.setTransactionid(alertBanksBean.getTransactionId());
-						schedulerEntity.setEmailEvent(alertBanksBean.getEvent());
+						schedulerEntity.setCustomerid(schdulerData.getCustomerid());
+						schedulerEntity.setTransactionid(schdulerData.getTransactionid());
+						schedulerEntity.setEmailEvent("LC_UPLOAD_ALERT_ToBanks");
 						schedulerEntity.setBanksEmailID(obj.getEmailAddress());
 						schedulerEntity.setBankUserid(obj.getUserid());
 						schedulerEntity.setBankUserName(obj.getFirstName());
+						int i = schdulerData.getScedulerid();
+						String trScheduledId = Integer.toString(i);
+						schedulerEntity.setTrScheduledId(trScheduledId);
+						schedulerEntity.setEmailFlag("pending");
+						// Bank user id transactionEmaiStatus is pending
+						schedulerEntity.setTransactionEmailStatusToBanks("pending");
 						userDao.saveSchdulerData(schedulerEntity);
 						data.setEmailList(obj.getEmailAddress());
 						return data;
 					}).collect(Collectors.toList());
 
-					response.setList(emailId);
-					response.setErrCode("success");
-					return new ResponseEntity<Object>(response, HttpStatus.OK);
+					// customer id transactioStatus is set as "In-process" to avoid duplicate
+					// entry of matching banks while iterating data
+					int scedulerid = schdulerData.getScedulerid();
+					userDao.updateTREmailStatus(scedulerid);
+
+					logger.info(
+							"Customer critria(minLc,blGoods,country) matching banks are not available to send the transaction upload alert");
+
 				} catch (Exception e) {
-					logger.info("Error while fetching the details from email_get_baksEmail procedure");
-					response.setMessage("Error While fetching Emails:" + e.getMessage());
-					return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+					logger.info(
+							"Customer critria(minLc,blGoods,country) matching banks are not available to send the customer transaction upload alert");
+
 				}
 			}
-
-			/*
-			 * while sending this alert we front end data should be quotationId,bankEmailId
-			 * should complusary provide
-			 */
-			else if (alertBanksBean.getEvent().equalsIgnoreCase("QUOTE_ACCEPT_ALERT_ToBanks")) {
-				logger.info("===========Inside the else if condition QUOTE_ACCEPT_ALERT_ToBanks=============");
-				NimaiEmailSchedulerAlertToBanks schedulerEntity = new NimaiEmailSchedulerAlertToBanks();
-				int quotationId=Integer.parseInt(alertBanksBean.getQuotationId()); 
-				QuotationMaster custTransactionDetails = userDao.getDetailsByQuoteId(quotationId);
-				NimaiClient bankUserId = userDao.getCustDetailsByUserId(custTransactionDetails.getBankUserId());
-				if (custTransactionDetails != null && bankUserId != null) {
-					Calendar cal = Calendar.getInstance();
-					Date insertedDate = cal.getTime();
-					schedulerEntity.setInsertedDate(insertedDate);
-					schedulerEntity.setQuotationId(quotationId);
-					schedulerEntity.setTransactionid(custTransactionDetails.getTransactionId());
-					schedulerEntity.setBankUserid(custTransactionDetails.getBankUserId());
-					schedulerEntity.setBankUserName(bankUserId.getFirstName());
-					schedulerEntity.setBanksEmailID(alertBanksBean.getBankEmail());
-					schedulerEntity.setCustomerid(custTransactionDetails.getUserId());
-					schedulerEntity.setEmailEvent(alertBanksBean.getEvent());
-					userDao.saveSchdulerData(schedulerEntity);
-				}
-
-			} else {
-				response.setErrCode("EX000");
-				response.setMessage("Quotation Id Or Bank User Id not Found");
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-			}
-		} else {
-			response.setErrCode("EX000");
-			response.setMessage(ErrorDescription.getDescription("EX000") + errorString.toString());
-			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		}
-		response.setMessage("Email for Event"+alertBanksBean.getEvent()+"will be send soon");
-		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	@Override
+ @Scheduled(fixedDelay = 50000)
 	public ResponseEntity<?> sendTransactionStatusToBanksByScheduled() {
+
 		// TODO Auto-generated method stub
 		logger.info("=====InsidesendTransactionStatusToBanksByScheduled method========= ");
 		GenericResponse response = new GenericResponse<>();
 
 		/* query to fetch the list of data from nimaiEmailAlertsTobankSchedulerTablw */
 		List<NimaiEmailSchedulerAlertToBanks> emailDetailsScheduled = userDao.getTransactionDetail();
-		Iterator itr = emailDetailsScheduled.iterator();
-		while (itr.hasNext()) {
-			NimaiEmailSchedulerAlertToBanks schdulerData = (NimaiEmailSchedulerAlertToBanks) itr.next();
+//		Iterator itr = emailDetailsScheduled.iterator();
+//		while (itr.hasNext()) {
+		for (NimaiEmailSchedulerAlertToBanks schdulerData : emailDetailsScheduled) {
+//			NimaiEmailSchedulerAlertToBanks schdulerData = (NimaiEmailSchedulerAlertToBanks) itr.next();
+//			String errorString = this.resetUserValidator.bankEmailValidation(schdulerData,
+//					schdulerData.getBanksEmailID());
+//			if (errorString.equalsIgnoreCase("Success")) {
+//			}
 
-			if (schdulerData.getEmailEvent().equalsIgnoreCase("QUOTE_ACCEPT_ALERT_ToBanks")) {
-				 
+			if (schdulerData.getEmailEvent().equalsIgnoreCase("QUOTE_ACCEPT")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("QUOTE_REJECTION")) {
+				logger.info("============Inside QUOTE_ACCEPT & QUOTE_REJECTION condition==========");
+				try {
+					/* method for email sending to banks */
+					emailInsert.sendQuotationStatusEmail(schdulerData.getEmailEvent(), schdulerData,
+							schdulerData.getBanksEmailID());
+					try {
+						/* method for sending the email to customer */
+						emailInsert.sendQuotationStatusEmailToCust(schdulerData.getEmailEvent(), schdulerData,
+								schdulerData.getCustomerEmail());
+					} catch (Exception e) {
+						if (e instanceof NullPointerException) {
+							response.setMessage("Email Sending failed");
+							EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+							response.setData(emailError);
+							return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+						}
+					}
+//					int scedulerid = schdulerData.getScedulerid();
+					userDao.updateEmailFlag(schdulerData.getScedulerid());
+					response.setMessage(ErrorDescription.getDescription("ASA002"));
+					return new ResponseEntity<Object>(response, HttpStatus.OK);
+				} catch (Exception e) {
+					if (e instanceof NullPointerException) {
+						response.setMessage("Email Sending failed");
+						EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+						response.setData(emailError);
+						return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+					}
+				}
+
+			}
+			if (schdulerData.getEmailEvent().equalsIgnoreCase("Bank_Details_tocustomer")) {
+				logger.info("============Inside Bank_Details_tocustomer condition==========");
+				QuotationMaster bnakQuotationDetails = userDao.getDetailsByQuoteId(schdulerData.getQuotationId());
+				if (bnakQuotationDetails != null) {
+					try {
+
+						emailInsert.sendBankDetailstoCustomer(schdulerData.getEmailEvent(), schdulerData,
+								schdulerData.getCustomerEmail(), bnakQuotationDetails);
+
+//						int scedulerid = schdulerData.getScedulerid();
+						userDao.updateEmailFlag(schdulerData.getScedulerid());
+						response.setMessage(ErrorDescription.getDescription("ASA002"));
+						return new ResponseEntity<Object>(response, HttpStatus.OK);
+
+					}
+
+					catch (Exception e) {
+						if (e instanceof NullPointerException) {
+							response.setMessage("Email Sending failed");
+							EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+							response.setData(emailError);
+							return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+						}
+
+					}
+
+				} else {
+					logger.info("Inside sendTransactionStatusToBanksByScheduled quotation id not found");
+					response.setMessage("Details not found");
+					return new ResponseEntity<Object>(response, HttpStatus.OK);
+				}
+			}
+			if (schdulerData.getEmailEvent().equalsIgnoreCase("QUOTE_PLACE_ALERT_ToBanks")) {
+				logger.info("============Inside QUOTE_PLACE_ALERT_ToBanks condition==========");
 				QuotationMaster bnakQuotationDetails = userDao.getDetailsByQuoteId(schdulerData.getQuotationId());
 				if (bnakQuotationDetails != null) {
 					try {
 						emailInsert.sendQuotePlaceEmailToBanks(schdulerData.getEmailEvent(), schdulerData,
 								schdulerData.getBanksEmailID(), bnakQuotationDetails);
-						int scedulerid = schdulerData.getScedulerid();
-						userDao.deleteEmailTransactionDetail(scedulerid);
+
+//						int scedulerid = schdulerData.getScedulerid();
+						userDao.updateEmailFlag(schdulerData.getScedulerid());
+						response.setMessage(ErrorDescription.getDescription("ASA002"));
+						return new ResponseEntity<Object>(response, HttpStatus.OK);
+
 					} catch (Exception e) {
 						if (e instanceof NullPointerException) {
 							response.setMessage("Email Sending failed");
@@ -183,17 +234,43 @@ public class BanksAlertEmailServiceImpl implements BanksALertEmailService {
 					response.setMessage("Details not found");
 					return new ResponseEntity<Object>(response, HttpStatus.OK);
 				}
-			} else if (schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPLOAD_ALERT_ToBanks")
-					|| schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPDATE_ALERT_ToBanks")) {
-				NimaiLC custTransactionDetails = userDao.getTransactioDetailsByTransIs(schdulerData.getTransactionid());
+			} else if (schdulerData.getEmailEvent().equalsIgnoreCase("BId_ALERT_ToCustomer")) {
+				try {
+					/*
+					 * method for sending the email to customer tht he received one bid after bank
+					 * place a quote against any transactionId
+					 */
+					String event = "BId_ALERT_ToCustomer";
+					emailInsert.sendBidRecivedEmailToCust(event, schdulerData, schdulerData.getCustomerEmail());
+					// int scedulerid = schdulerData.getScedulerid();
+					userDao.updateEmailFlag(schdulerData.getScedulerid());
+					response.setMessage(ErrorDescription.getDescription("ASA002"));
+					return new ResponseEntity<Object>(response, HttpStatus.OK);
+
+				} catch (Exception e) {
+					if (e instanceof NullPointerException) {
+						response.setMessage("Email Sending failed");
+						EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+						response.setData(emailError);
+						return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+					}
+				}
+			}
+			if (schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPLOAD(DATA)")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPDATE(DATA)")) {
+
+				logger.info("============Inside LC_UPLOAD_ALERT_ToBanks & LC_UPDATE_ALERT_ToBankscondition==========");
+
+				NimaiLC custTransactionDetails = userDao.getTransactioDetailsByTransId(schdulerData.getTransactionid());
 				NimaiClient custDetails = userDao.getCustDetailsByUserId(schdulerData.getCustomerid());
 				try {
 					if (custTransactionDetails != null && custDetails != null) {
-						emailInsert.sendTransactionStatusToBanks(schdulerData.getEmailEvent(), schdulerData,
-								schdulerData.getBanksEmailID(), custTransactionDetails, custDetails);
-						
-						int scedulerid = schdulerData.getScedulerid();
-						userDao.deleteEmailTransactionDetail(scedulerid);
+
+						emailInsert.sendLcStatusEmailData(schdulerData, custTransactionDetails, custDetails);
+						// int scedulerid = schdulerData.getScedulerid();
+						userDao.updateEmailFlag(schdulerData.getScedulerid());
+						response.setMessage(ErrorDescription.getDescription("ASA002"));
+						return new ResponseEntity<Object>(response, HttpStatus.OK);
 
 					} else {
 						logger.info("Inside sendTransactionStatusToBanksByScheduled transaction id not found");
@@ -210,9 +287,61 @@ public class BanksAlertEmailServiceImpl implements BanksALertEmailService {
 					}
 				}
 			}
+			if (schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPLOAD_ALERT_ToBanks")
+					|| schdulerData.getEmailEvent().equalsIgnoreCase("LC_UPDATE_ALERT_ToBanks")) {
+
+				logger.info("============Inside LC_UPLOAD_ALERT_ToBanks & LC_UPDATE_ALERT_ToBankscondition==========");
+
+				NimaiLC custTransactionDetails = userDao.getTransactioDetailsByTransId(schdulerData.getTransactionid());
+				NimaiClient custDetails = userDao.getCustDetailsByUserId(schdulerData.getCustomerid());
+				if (custTransactionDetails != null && custDetails != null) {
+					if (schdulerData.getTransactionEmailStatusToBanks() == null) {
+						try {
+							emailInsert.sendTransactionStatusToBanks(schdulerData, custTransactionDetails, custDetails);
+
+							int scedulerid = schdulerData.getScedulerid();
+							userDao.updateEmailFlag(scedulerid);
+							response.setMessage(ErrorDescription.getDescription("ASA002"));
+							return new ResponseEntity<Object>(response, HttpStatus.OK);
+						} catch (Exception e) {
+							if (e instanceof NullPointerException) {
+								response.setMessage("Email Sending failed");
+								EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+								response.setData(emailError);
+								return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+							}
+						}
+					} else {
+						try {
+
+							emailInsert.sendTransactionStatusToBanks(schdulerData, custTransactionDetails, custDetails);
+							// this scheduler id updating emailTRStatus flag from pending to sent
+//							int schedulerId = Integer.parseInt(schdulerData.getTrScheduledId());
+							userDao.updateTrStatusEmailFlag(Integer.parseInt(schdulerData.getTrScheduledId()));
+
+							// this scheduler id updating bank email status flag from pending to sent
+							int scedulerid = schdulerData.getScedulerid();
+							userDao.updateBankEmailFlag(schdulerData.getScedulerid());
+
+						} catch (Exception e) {
+							if (e instanceof NullPointerException) {
+								response.setMessage("Email Sending failed");
+								EmailErrorCode emailError = new EmailErrorCode("EmailNull", 409);
+								response.setData(emailError);
+								return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+							}
+						}
+					}
+
+				} else {
+					logger.info("Inside sendTransactionStatusToBanksByScheduled transaction id not found");
+					response.setMessage("Details not found");
+					return new ResponseEntity<Object>(response, HttpStatus.OK);
+				}
+			}
+			response.setMessage("Email send successFully for event");
 		}
-		response.setMessage("Email send successFully for event");
-		return new ResponseEntity<Object>(response, HttpStatus.OK);
+		return null;
 	}
 
 	@Override

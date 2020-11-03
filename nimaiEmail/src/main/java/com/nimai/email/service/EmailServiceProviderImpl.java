@@ -1,5 +1,6 @@
 package com.nimai.email.service;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 import javax.mail.MessagingException;
@@ -16,7 +17,7 @@ public class EmailServiceProviderImpl {
 	EmailContentBean emailContentBean;
 	
 	
-	public void sendemail(ArrayList  input) throws MessagingException
+	public void sendemail(ArrayList  input) throws MessagingException, SocketTimeoutException
 	 {
 		System.out.println("in EmailServiceProviderImpl");
 

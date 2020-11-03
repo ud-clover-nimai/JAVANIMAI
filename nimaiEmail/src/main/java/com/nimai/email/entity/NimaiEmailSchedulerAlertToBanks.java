@@ -22,7 +22,7 @@ public class NimaiEmailSchedulerAlertToBanks {
 	@Column(name = "scheduler_Id")
 	private int scedulerid;
 
-	@Column(name = "customer_userId")
+	@Column(name = "customer_user_id")
 	private String customerid;
 
 	@Column(name = "transaction_id")
@@ -37,10 +37,10 @@ public class NimaiEmailSchedulerAlertToBanks {
 	@Column(name = "inserted_date")
 	private Date insertedDate;
 	
-	@Column(name="bank_userId")
-private String bankUserid;
+	@Column(name="bank_user_id")
+	private String bankUserid;
 	
-	@Column(name="bank_userName")
+	@Column(name="bank_user_name")
 	private String bankUserName;
 	
 	@Column(name="email_event")
@@ -49,10 +49,94 @@ private String bankUserid;
 	@Column(name="quotation_id")
 	private Integer quotationId;
 	
+	@Column(name="customer_email_id")
+	private String customerEmail;
+	
+	@Column(name="customer_user_name")
+	private String customerUserName;
+	
+	@Column(name="Email_Status")
+	private String emailFlag;
+	
+	@Column(name="TR_SCHEDULED_ID")
+	private String trScheduledId;
+	
+	@Column(name="TR_Email_status_To_Banks")
+	private String transactionEmailStatusToBanks;
+	
+	
 	
 	
 
+	/**
+	 * @return the trScheduledId
+	 */
+	public String getTrScheduledId() {
+		return trScheduledId;
+	}
 
+	/**
+	 * @param trScheduledId the trScheduledId to set
+	 */
+	public void setTrScheduledId(String trScheduledId) {
+		this.trScheduledId = trScheduledId;
+	}
+
+	/**
+	 * @return the transactionEmailStatusToBanks
+	 */
+	public String getTransactionEmailStatusToBanks() {
+		return transactionEmailStatusToBanks;
+	}
+
+	/**
+	 * @param transactionEmailStatusToBanks the transactionEmailStatusToBanks to set
+	 */
+	public void setTransactionEmailStatusToBanks(String transactionEmailStatusToBanks) {
+		this.transactionEmailStatusToBanks = transactionEmailStatusToBanks;
+	}
+
+	/**
+	 * @return the emailFlag
+	 */
+	public String getEmailFlag() {
+		return emailFlag;
+	}
+
+	/**
+	 * @param emailFlag the emailFlag to set
+	 */
+	public void setEmailFlag(String emailFlag) {
+		this.emailFlag = emailFlag;
+	}
+
+	/**
+	 * @return the customerUserName
+	 */
+	public String getCustomerUserName() {
+		return customerUserName;
+	}
+
+	/**
+	 * @param customerUserName the customerUserName to set
+	 */
+	public void setCustomerUserName(String customerUserName) {
+		this.customerUserName = customerUserName;
+	}
+
+	/**
+	 * @return the customerEmail
+	 */
+	public String getCustomerEmail() {
+		return customerEmail;
+	}
+
+	/**
+	 * @param customerEmail the customerEmail to set
+	 */
+	public void setCustomerEmail(String customerEmail) {
+		this.customerEmail = customerEmail;
+	}
 
 	/**
 	 * @return the quotationId

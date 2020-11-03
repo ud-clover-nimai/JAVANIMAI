@@ -8,8 +8,26 @@ public class AlertToBanksBean {
 	private String transactionId;
 	private String event;
 	private String reason;
+	private String emailFlag;
 	private List<EmailSendingDetails> bankEmails;
 	private String bankEmail;
+
+	
+	
+	
+	/**
+	 * @return the emailFlag
+	 */
+	public String getEmailFlag() {
+		return emailFlag;
+	}
+
+	/**
+	 * @param emailFlag the emailFlag to set
+	 */
+	public void setEmailFlag(String emailFlag) {
+		this.emailFlag = emailFlag;
+	}
 
 	/**
 	 * @return the customerUserId
