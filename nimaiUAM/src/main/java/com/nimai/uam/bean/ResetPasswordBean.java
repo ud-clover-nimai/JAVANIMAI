@@ -10,14 +10,6 @@ public class ResetPasswordBean {
 	public String getToken;
 
 	
-	public String getGetToken() {
-		return getToken;
-	}
-
-	public void setGetToken(String getToken) {
-		this.getToken = getToken;
-	}
-
 	public String getEmailId() {
 		return emailId;
 	}

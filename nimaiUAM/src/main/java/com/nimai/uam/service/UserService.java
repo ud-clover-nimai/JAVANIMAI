@@ -1,8 +1,8 @@
 package com.nimai.uam.service;
 
-import com.nimai.uam.bean.ChangePasswordBean;
 import com.nimai.uam.bean.LoginRequest;
 import com.nimai.uam.bean.ResetPasswordBean;
+import com.nimai.uam.entity.NimaiClient;
 import com.nimai.uam.entity.NimaiMLogin;
 
 public interface UserService {
@@ -19,11 +19,10 @@ public interface UserService {
 
 	NimaiMLogin saveResetPasswordDetails(ResetPasswordBean resetPasswordBean);
 
-	NimaiMLogin saveChangedPasswordDetails(ChangePasswordBean changePasswordBean);
-
-	
 	boolean checkSignIncrendentials(LoginRequest loginRequestBean);
 
 	String checkUserStatus(String string);
+
+	String getKycStatus(String userId);
 
 }

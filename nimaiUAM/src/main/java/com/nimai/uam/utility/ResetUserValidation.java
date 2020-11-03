@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.nimai.uam.bean.ChangePasswordBean;
 import com.nimai.uam.bean.LoginRequest;
 import com.nimai.uam.bean.ResetPasswordBean;
 import com.nimai.uam.entity.NimaiMLogin;
@@ -53,61 +52,22 @@ public class ResetUserValidation {
 
 	public String passwordValidation(ResetPasswordBean resetPasswordBean) {
 
-		// boolean isUserIdExist =
-		// userService.checkUserId(resetPasswordBean.getGetToken());
-		NimaiMLogin nimaiLoginTOken = loginRepo.findUserByToken(resetPasswordBean.getToken);
+//		boolean isUserIdExist = userService.checkUserId(resetPasswordBean.getUserId());
 //		Optional<NimaiMLogin> loginDetails = loginRepo.findByUserId(resetPasswordBean.getUserId());
 //		NimaiMLogin login = loginDetails.get();
 		String returnStr = "";
 		try {
 //			if (!isUserIdExist) {
-//				return "Invalid UserID";
+//				return "UserId is Not Exist" + resetPasswordBean.getUserId();
 //			}
 //			if (login.getIsActPassed().equalsIgnoreCase("Inactive")) {
 //				return "User Account is Inactive";
 //			}
-
-			if (nimaiLoginTOken != null) {
-				if ((resetPasswordBean.getNewPassword() == null) && (resetPasswordBean.getRetypePaasword() == null)) {
-					return "New password and Retype password should not be empty";
-				}
-
-				if (!resetPasswordBean.getNewPassword().equalsIgnoreCase(resetPasswordBean.getRetypePaasword())) {
-					return "New password & Retype Paswword Should Match With Each Other ";
-				}
-				returnStr = "success";
-			} else {
-				returnStr = "Token Expired";
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			returnStr = "Failed : " + e.getMessage();
-		}
-		return returnStr;
-
-	}
-
-	public String changePasswordValidation(ChangePasswordBean changePasswordBean) {
-
-		boolean isUserIdExist = userService.checkUserId(changePasswordBean.getUserId());
-
-		Optional<NimaiMLogin> loginDetails = loginRepo.findByUserId(changePasswordBean.getUserId());
-		NimaiMLogin login = loginDetails.get();
-
-		String returnStr = "";
-		try {
-			if (!isUserIdExist) {
-				return "Invalid UserID";
-			}
-			if (!login.getPassword().equals(changePasswordBean.getOldPassword())) {
-				return "Old password didn't matched.";
-			}
-			if ((login.getPassword() == null) && (changePasswordBean.getNewPassword() == null)
-					&& (changePasswordBean.getRetypePaasword() == null)) {
+			if ((resetPasswordBean.getNewPassword() == null) && (resetPasswordBean.getRetypePaasword() == null)) {
 				return "New password and Retype password should not be empty";
 			}
-			if (!changePasswordBean.getNewPassword().equalsIgnoreCase(changePasswordBean.getRetypePaasword())) {
+
+			if (!resetPasswordBean.getNewPassword().equalsIgnoreCase(resetPasswordBean.getRetypePaasword())) {
 				return "New password & Retype Paswword Should Match With Each Other ";
 			}
 			returnStr = "success";
@@ -119,13 +79,15 @@ public class ResetUserValidation {
 
 	}
 
-	public String loginRequestValidation(LoginRequest loginRequestBean) {
 
+	public String loginRequestValidation(LoginRequest loginRequestBean) {
+		
 		String is_Act_Passed_Status = userService.checkUserStatus(loginRequestBean.getUserId());
 		String returnStr = "";
 		try {
 
-			if (loginRequestBean != null) {
+			if(loginRequestBean != null )
+			{
 				if ((loginRequestBean.getUserId() == null) || (loginRequestBean.getUserId().trim().isEmpty())) {
 					return "Please enter UserId";
 				}
@@ -136,7 +98,7 @@ public class ResetUserValidation {
 				if (!is_Act_Passed_Status.equalsIgnoreCase("Active")) {
 					return "Request you to kindly activate your account, using the reset password link shared earlier.";
 				}
-			}
+			}	
 			returnStr = "success";
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -145,5 +107,6 @@ public class ResetUserValidation {
 		return returnStr;
 
 	}
+
 
 }
