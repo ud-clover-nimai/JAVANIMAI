@@ -8,6 +8,8 @@ public interface KycStorageService {
 
 	ResponseEntity<?> saveOrUpdatekycDetails(kycBase64Request kycRequest);
 
+	ResponseEntity<Object> getKycDetailsByUserId(String userId);
+
 	
 
 }
