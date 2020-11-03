@@ -1,6 +1,5 @@
 package com.nimai.uam.service;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
@@ -9,9 +8,9 @@ import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nimai.uam.bean.ChangePasswordBean;
 import com.nimai.uam.bean.LoginRequest;
 import com.nimai.uam.bean.ResetPasswordBean;
+import com.nimai.uam.entity.NimaiClient;
 import com.nimai.uam.entity.NimaiMLogin;
 import com.nimai.uam.repository.LoginRepository;
 import com.nimai.uam.repository.UserDetailRepository;
@@ -106,8 +105,6 @@ public class UserServiceImpl implements UserService {
 		NimaiMLogin nimaiLogin = login.get();
 		nimaiLogin.setIsActPassed("ACTIVE");
 		nimaiLogin.setPassword(resetPasswordBean.getRetypePaasword());
-		nimaiLogin.setToken(null);
-		nimaiLogin.setTokenExpiryDate(null);
 		loginRepository.save(nimaiLogin);
 		return nimaiLogin;
 	}
@@ -135,17 +132,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public NimaiMLogin saveChangedPasswordDetails(ChangePasswordBean changePasswordBean) {
-		
-		Optional<NimaiMLogin> login = loginRepository.findByUserId(changePasswordBean.getUserId());
-		NimaiMLogin nimaiLogin = login.get();
-		nimaiLogin.setPassword(changePasswordBean.getRetypePaasword());
-		
-		Calendar cal = Calendar.getInstance();
-		Date insertedDate = cal.getTime();
-		nimaiLogin.setModifiedDate(insertedDate);
-		
-		loginRepository.save(nimaiLogin);
-		return nimaiLogin;
+	public String getKycStatus(String userId) {
+		Optional<NimaiClient> kycStatus = userDetailsRepository.findById(userId);
+		if(kycStatus!=null && kycStatus.get().getKycStatus()!=null && !kycStatus.get().getKycStatus().isEmpty()) {
+			return kycStatus.get().getKycStatus();
+		}
+				return null;
 	}
 }
