@@ -1,25 +1,41 @@
 package com.nimai.kyc.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.print.DocFlavor.INPUT_STREAM;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.nimai.kyc.exception.ErrorDescription;
+import com.nimai.kyc.exception.ResourceNotFoundException;
 import com.nimai.kyc.model.GenericResponse;
+import com.nimai.kyc.model.NimaiEmailScheduler;
 import com.nimai.kyc.model.NimaiKyc;
 import com.nimai.kyc.model.NimaiMCustomer;
+import com.nimai.kyc.model.NimaiMEmployee;
+import com.nimai.kyc.payload.BusinessKycList;
+import com.nimai.kyc.payload.PersonalKycList;
 import com.nimai.kyc.payload.kycBase64Request;
 import com.nimai.kyc.repository.NimaiCustomerRepository;
+import com.nimai.kyc.repository.NimaiEmailSchedularRepository;
+import com.nimai.kyc.repository.NimaiEmployeeRepository;
 import com.nimai.kyc.repository.NimaiKycBase64Repository;
 import com.nimai.kyc.util.ModelMapper;
 import com.nimai.kyc.util.kycValidator;
 
 @Service
 public class KycStorageServiceImpl implements KycStorageService {
+	private static Logger logger = LoggerFactory.getLogger(KycStorageServiceImpl.class);
 
 	@Autowired
 	NimaiCustomerRepository nimaiCustomerRepository;
@@ -29,6 +45,12 @@ public class KycStorageServiceImpl implements KycStorageService {
 
 	@Autowired
 	NimaiKycBase64Repository kycRepository;
+
+	@Autowired
+	NimaiEmployeeRepository employeeRepository;
+
+	@Autowired
+	NimaiEmailSchedularRepository schedularRepository;
 
 	/*
 	 * while uploading the kyc the kyc status will be 0 in nimaiFKYC as well as it
@@ -40,10 +62,12 @@ public class KycStorageServiceImpl implements KycStorageService {
 		String errorString = this.kycValidator.kycRequestValidator(kycRequest);
 		if (errorString.equalsIgnoreCase("success")) {
 			NimaiMCustomer userId = nimaiCustomerRepository.findByUId(kycRequest.getUserId());
-			String customerUserId = userId.getUserid();
+
+			// NimaiMEmployee
+
 			List<NimaiKyc> kycDetailList = kycRepository.getKycDetailsByUserId(kycRequest.getUserId());
 			if (userId != null) {
-
+				String customerUserId = userId.getUserid();
 				if (kycRequest.getBusinessDocumentList().size() > 0) {
 					List<NimaiKyc> kycList = kycRequest.getBusinessDocumentList().stream().map(mapper -> {
 						NimaiKyc nimaiKycDoc = new NimaiKyc();
@@ -52,7 +76,6 @@ public class KycStorageServiceImpl implements KycStorageService {
 						nimaiKycDoc = ModelMapper.convertEntityKycRequestToDbObj(mapper, nimaiKycDoc);
 						return nimaiKycDoc;
 					}).collect(Collectors.toList());
-
 					kycRepository.saveAll(kycList);
 					response.setMessage("Busines kyc save successfully");
 				}
@@ -71,9 +94,45 @@ public class KycStorageServiceImpl implements KycStorageService {
 
 				nimaiCustomerRepository.updateKycStatus("Pending", userId.getUserid());
 				userId.setKycStatus("Pending");
-				nimaiCustomerRepository.save(userId);
 				
-				response.setErrCode("EXE000");				
+				nimaiCustomerRepository.save(userId);
+				NimaiEmailScheduler schedularData = new NimaiEmailScheduler();
+				NimaiMEmployee employeeRmDetails = employeeRepository.getDetailsByRmId(userId.getRmId());
+				String businessDocName = businessListInStringForm(kycRequest.getBusinessDocumentList())
+
+						.replaceAll("\\[", "").replaceAll("\\]", "");
+				if (businessDocName != null) {
+					schedularData.setBusinessKycDoc(businessDocName);
+				}
+				String personalDocName = personalListInStringForm(kycRequest.getPersonalDocumentList())
+						.replaceAll("\\[", "").replaceAll("\\]", "");
+				if (personalDocName != null) {
+					schedularData.setPersonalKycDoc(personalDocName);
+				}
+				if (employeeRmDetails != null) {
+					logger.error("RM ID is not assign to the customer");
+
+					schedularData.setEmailId(employeeRmDetails.getEmpEmail());
+					String rMId = Integer.toString(employeeRmDetails.getEmpId());
+					schedularData.setBranchId(rMId);
+					schedularData.setrMName(employeeRmDetails.getEmpName());
+					schedularData.setUserid(customerUserId);
+					schedularData.setUserName(userId.getFirstName());
+					schedularData.setEmailId(userId.getEmailAddress());
+					schedularData.setEvent("KYC_UPLOAD");
+					schedularData.setEmailStatus("pending");
+
+				} else {
+					schedularData.setUserid(customerUserId);
+					schedularData.setUserName(userId.getFirstName());
+					schedularData.setEmailId(userId.getEmailAddress());
+					schedularData.setEvent("KYC_UPLOAD");
+					schedularData.setEmailStatus("pending");
+
+				}
+				schedularRepository.save(schedularData);
+
+				response.setErrCode("EXE000");
 				return new ResponseEntity<Object>(response, HttpStatus.OK);
 
 			}
@@ -85,6 +144,50 @@ public class KycStorageServiceImpl implements KycStorageService {
 
 		response.setErrCode("User not registred");
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
+
+	}
+
+	@Override
+	public ResponseEntity<Object> getKycDetailsByUserId(String userId) {
+		logger.info("getKycByUserId is been called");
+
+		List<NimaiKyc> kyc = kycRepository.getKycDetailsByUserId(userId);
+
+		if (kyc.size() != 0) {
+
+			Stream<Object> kycResponses = kyc.stream().map(kycdETAILS -> {
+				return ModelMapper.mapKycDetailsToKycResponse(kycdETAILS);
+			});
+
+			return new ResponseEntity<Object>(kycResponses, HttpStatus.OK);
+		} else {
+			logger.error("User with provided user id is not Present");
+			throw new ResourceNotFoundException("No Kyc Details exist for given userId");
+		}
+
+	}
+
+	private String businessListInStringForm(List<BusinessKycList> businessList) {
+		ArrayList<String> docName = new ArrayList<>();
+		if (businessList.size() > 0) {
+			for (BusinessKycList businessKycList : businessList) {
+				docName.add(businessKycList.getDocumentName());
+			}
+			return Arrays.asList(docName).toString();
+		}
+		return null;
+
+	}
+
+	private String personalListInStringForm(List<PersonalKycList> personalKycList) {
+		ArrayList<String> docName = new ArrayList<>();
+		if (personalKycList.size() > 0) {
+			for (PersonalKycList businessKycList : personalKycList) {
+				docName.add(businessKycList.getDocumentName());
+			}
+			return Arrays.asList(docName).toString();
+		}
+		return null;
 
 	}
 
